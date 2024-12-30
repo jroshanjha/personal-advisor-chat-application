@@ -1,0 +1,260 @@
+Budget Planning:-
+
+Users input income, expenses, and savings goals.
+The app uses an LLM to generate suggestions on reducing expenses and meeting savings goals.
+
+Investment Guidance:-
+Users provide investment preferences (risk tolerance, time frame, goals).
+The app fetches live financial data (e.g., stock prices, mutual fund options) and combines it with LLM advice to recommend strategies.
+
+Debt Management:-
+Allows users to input debts, interest rates, and repayment terms.
+The LLM suggests optimal repayment plans (e.g., snowball or avalanche method).
+
+Expense Analysis:-
+
+Visualizes user expenses in charts.
+The LLM analyzes spending patterns and recommends optimizations.
+
+Q&A Chat:-
+An interactive chatbot where users can ask finance-related questions, like “What’s the best way to save for retirement?” or “How do I start investing in stocks?”
+
+...............................................................................................................................
+...................................................................................................................
+
+Core Features
+Symptom Analysis:
+Users input symptoms, and the LLM generates possible diagnoses using pre-trained medical datasets.
+
+Medication Guidance:
+Fetch drug interactions, side effects, and alternatives from APIs like the FDA API or OpenFDA.
+
+Appointment Scheduling:
+Integrate APIs like Zocdoc for scheduling consultations with local doctors.
+
+Medical Records Integration:
+Allow users to upload and analyze medical reports (e.g., PDFs or images) using OCR and LLMs for interpretation.
+
+Challenges to Solve
+Accuracy: Use fine-tuned medical models (e.g., PubMedGPT).
+Regulatory Compliance: Ensure HIPAA/GDPR compliance
+
+
+.............................
+..........................................
+.............................
+
+
+
+# # Streamlit App
+# st.title("AI-Powered Learning Platform 📚")
+
+# menu = st.sidebar.radio("Menu", ["Log Progress", "View Progress"])
+
+# if menu == "Log Progress":
+#     st.header("Log Your Progress")
+#     user_id = st.text_input("Enter User ID", "user123")
+#     lesson_name = st.text_input("Lesson Name")
+#     score = st.slider("Score", 0, 100, 80)
+
+#     if st.button("Save Progress"):
+#         log_progress(user_id, lesson_name, score)
+#         st.success(f"Progress saved for {lesson_name}!")
+
+# elif menu == "View Progress":
+#     st.header("Your Progress")
+#     user_id = st.text_input("Enter User ID", "user123")
+
+#     if st.button("View Progress"):
+#         progress_df = fetch_user_progress(user_id)
+#         if not progress_df.empty:
+#             st.write("### Progress Data:")
+#             st.dataframe(progress_df)
+#             plot_progress(progress_df)
+#         else:
+#             st.write("No progress data found!")
+
+
+..........................
+from flask import Flask, session, redirect, url_for, request, render_template
+from flask_session import Session
+from flask_mysqldb import MySQL
+import bcrypt
+
+app = Flask(__name__)
+
+# Configure Session and MySQL
+app.secret_key = "your_secret_key"  # Change this to a secure key
+app.config["SESSION_TYPE"] = "filesystem"
+Session(app)
+
+app.config["MYSQL_HOST"] = "localhost"
+app.config["MYSQL_USER"] = "your_username"
+app.config["MYSQL_PASSWORD"] = "your_password"
+app.config["MYSQL_DB"] = "your_database"
+
+mysql = MySQL(app)
+
+# Routes
+@app.route("/")
+def home():
+    if "user_id" in session:
+        return f"Welcome back, {session['username']}!"
+    return redirect(url_for("login"))
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+
+        # Check user credentials
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT id, password FROM users WHERE username = %s", (username,))
+        user = cur.fetchone()
+        cur.close()
+
+        if user and bcrypt.checkpw(password.encode("utf-8"), user[1].encode("utf-8")):
+            session["user_id"] = user[0]
+            session["username"] = username
+            return redirect(url_for("home"))
+        else:
+            return "Invalid credentials. Please try again."
+
+    return render_template("login.html")
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+
+        # Hash the password
+        hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
+
+        # Save user to the database
+        cur = mysql.connection.cursor()
+        try:
+            cur.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, hashed_password.decode("utf-8")))
+            mysql.connection.commit()
+        except:
+            return "Error: Username already exists."
+        finally:
+            cur.close()
+
+        return redirect(url_for("login"))
+
+    return render_template("register.html")
+
+if __name__ == "__main__":
+    app.run(debug=True)
+
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+</head>
+<body>
+    <h1>Login</h1>
+    <form method="POST" action="/login">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <br>
+        <button type="submit">Login</button>
+    </form>
+</body>
+</html>
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+</head>
+<body>
+    <h1>Register</h1>
+    <form method="POST" action="/register">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <br>
+        <button type="submit">Register</button>
+    </form>
+</body>
+</html>
+
+
+
+# chart_type = st.selectbox("Select Chart Type", ["Line", "Bar", "Histogram", "Pie", "Scatter"])
+    # if chart_type == "Line":
+    #     # Line chart code here
+    #     plt.figure(figsize=(10, 5))
+    #     plt.plot(dataframe["Lesson"], dataframe["Score"], marker="o", color="b")
+    #     plt.title("User Progress Over Time")
+    #     plt.xlabel("Lesson")
+    #     plt.ylabel("Score")
+    #     plt.xticks(rotation=45)
+    #     plt.tight_layout()
+    #     st.pyplot(plt)
+
+    # elif chart_type == "Bar":
+    #     # Bar chart code here
+    #     plt.figure(figsize=(10, 5))
+    #     plt.bar(dataframe["Lesson"], dataframe["Score"], color="skyblue")
+    #     plt.title("User Progress Over Time")
+    #     plt.xlabel("Lesson")
+    #     plt.ylabel("Score")
+    #     plt.xticks(rotation=45)
+    #     plt.tight_layout()
+    #     st.pyplot(plt)
+
+    # elif chart_type == "Histogram":
+    #     # Histogram code here
+    #     plt.figure(figsize=(10, 5))
+    #     plt.hist(dataframe["Score"], bins=10, color="orange", edgecolor="black")
+    #     plt.title("Score Distribution")
+    #     plt.xlabel("Score")
+    #     plt.ylabel("Frequency")
+    #     plt.tight_layout()
+    #     st.pyplot(plt)
+
+    # elif chart_type == "Pie":
+    #     # Pie chart code here
+    #     plt.figure(figsize=(10, 5))
+    #     plt.pie(dataframe["Score"], labels=dataframe["Lesson"], autopct='%1.1f%%', startangle=90, colors=plt.cm.Paired.colors)
+    #     plt.title("Score Distribution by Lesson")
+    #     plt.tight_layout()
+    #     st.pyplot(plt)
+        
+    # elif chart_type == "Scatter":
+    #     # Scatter plot code here
+    #     plt.figure(figsize=(10, 5))
+    #     plt.scatter(dataframe["Lesson"], dataframe["Score"], color="green", alpha=0.7)
+    #     plt.title("User Progress Over Time")
+    #     plt.xlabel("Lesson")
+    #     plt.ylabel("Score")
+    #     plt.xticks(rotation=45)
+    #     plt.tight_layout()
+    #     st.pyplot(plt)
