@@ -1,7 +1,7 @@
 import streamlit as st
 from PIL import Image
 
-def index():
+def home():
     # Page title
     st.title("Home Page")
     st.subheader("Welcome to My Chat Boart Application!")
@@ -49,10 +49,10 @@ def index():
     )
 
     # Call-to-action button
-    st.button("Learn More", key="learn_more")
+    # st.button("Learn More", key="learn_more")
 
     # Footer section
     st.markdown("---")
-    st.markdown("© 2024 My Chat Application | All rights reserved. Develop by jroshan")
+    st.markdown("© 2024 My Chat Application | All rights reserved. Developed by jroshan")
 
-index()
+home()

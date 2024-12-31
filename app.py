@@ -1,15 +1,10 @@
 import streamlit as st
 import mysql.connector
 import bcrypt
-
-# from app1 import app as app1
-#from learningflatform import learningflatform as app1
 import learningflatform
 from travel import t_ravel
 from finance import financial
 from medical import medical_method
-# import travel
-# import finance
 # from pages.home import index
 # from pages.about import about
 
@@ -36,14 +31,28 @@ def register_user(username, password):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, hashed.decode("utf-8")))
-        conn.commit()
-        st.success("User registered successfully!")
+
+        # Check if the username already exists
+        cursor.execute("SELECT COUNT(*) FROM users WHERE username = %s", (username,))
+        user_exists = cursor.fetchone()[0]
+
+        if user_exists > 0:
+            st.error("Username already exists. Please choose a different username.")
+        else:
+            # Insert the new user
+            cursor.execute(
+                "INSERT INTO users (username, password) VALUES (%s, %s)",
+                (username, hashed.decode("utf-8"))
+            )
+            conn.commit()
+            st.success("Registration successful! Please login.")
+
     except mysql.connector.Error as err:
         st.error(f"Error: {err}")
     finally:
         cursor.close()
         conn.close()
+
 # Authenticate User
 def authenticate_user(username, password):
     try:
@@ -67,16 +76,14 @@ def login():
             st.session_state.authenticated = True
             st.session_state.username = username
             st.session_state.page = "Dashboard"
-            st.success("Login successful!")
+            st.success("Logged in successfully!")
+            st.rerun()
             #st.home()
-            learningflatform.dashboard()
+            #learningflatform.dashboard()
             #home()
-            
         else:
             st.error("Invalid username or password.")
-    # Footer section
-    # st.markdown("---")
-    # st.markdown("© 2024 My Chat Application | All rights reserved. Develop by jroshan")
+            
 # Register Form
 def register():
     st.title("Register")
@@ -84,10 +91,12 @@ def register():
     password = st.text_input("New Password", type="password")
     if st.button("Register"):
         register_user(username, password)
-    
-    # Footer section
-    st.markdown("---")
-    st.markdown("© 2024 My Chat Application | All rights reserved. Develop by jroshan")
+        #st.session_state.page = "Login"
+        #st.rerun()
+        
+    # if st.button("Back to Login"):
+    #     st.session_state.page = "Login"
+    #     st.rerun()
 
 # Logout section 
 def logout():
@@ -95,16 +104,13 @@ def logout():
         st.session_state.authenticated = False
         st.session_state.username = None
         st.success("Logout successful!")
-        login()
+        #login()
+        st.session_state.page = "Login"
+        st.rerun()
         #st.session_state.page = "Login"
         # if "authenticated" not in st.session_state:
         #     navigation()
         #st.session_state.authenticated = False
-    
-        
-    # Footer section
-    st.markdown("---")
-    st.markdown("© 2024 My Chat Application | All rights reserved. Develop by jroshan")
         
 # Dashboard
 def leaning():
@@ -112,7 +118,6 @@ def leaning():
     #st.write(f"Welcome, {st.session_state.username}!")
     #st.dashboard()
     learningflatform.dashboard()
-
     
 # Navigation
 def navigation():
@@ -158,12 +163,14 @@ def navigation():
 # # Streamlit Session State Management
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
+    st.session_state.username = None
 
 # Main
 if __name__ == "__main__":
     if "authenticated" not in st.session_state and not st.session_state.username:
         st.session_state.authenticated = False
         login()
+        st.rerun()
     else:
         navigation()
         
