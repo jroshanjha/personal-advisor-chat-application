@@ -148,7 +148,7 @@ def dashboard():
         topic = st.text_input("Enter Topic (e.g., Python Loops, Calculus Derivatives)")
         num_questions = st.slider("Number of Questions", 1, 20, 5)
         if st.button("Generate Exercises"):
-            result = log_progress(,topic,88)
+            result = log_progress('user_1',topic,88)
             # if result ==True:
             #     pass
             prompt = f"Create {num_questions} practice questions with answers on {topic}."
