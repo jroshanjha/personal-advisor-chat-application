@@ -10,8 +10,8 @@ from finance import financial
 from medical import medical_method
 # import travel
 # import finance
-from pages.home import home
-from pages.about import about
+# from pages.home import index
+# from pages.about import about
 
 # MySQL Connection Configuration :- begin configuration:-
 db_config = {
@@ -108,14 +108,11 @@ def logout():
         
 # Dashboard
 def leaning():
-    st.title("Dashboard")
-    st.write(f"Welcome, {st.session_state.username}!")
+    #st.title("Dashboard")
+    #st.write(f"Welcome, {st.session_state.username}!")
     #st.dashboard()
     learningflatform.dashboard()
-    
-    # Footer section
-    st.markdown("---")
-    st.markdown("© 2024 My Chat Application | All rights reserved. Develop by jroshan")
+
     
 # Navigation
 def navigation():
@@ -164,6 +161,12 @@ if "authenticated" not in st.session_state:
 
 # Main
 if __name__ == "__main__":
-    if "authenticated" not in st.session_state and st.session_state.username:
+    if "authenticated" not in st.session_state and not st.session_state.username:
         st.session_state.authenticated = False
-    navigation()
+        login()
+    else:
+        navigation()
+        
+    # Footer section
+    st.markdown("---")
+    st.markdown("© 2024 My Chat Application | All rights reserved. Developed by jroshan")

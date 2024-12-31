@@ -33,7 +33,6 @@ def get_db_conn():
 def get_gemini_response(text):
     response = model.generate_content(text)
     return response.text
-
 def log_progress(user_id, lesson_name, score):
     try:
         conn = get_db_conn()
@@ -50,7 +49,7 @@ def log_progress(user_id, lesson_name, score):
     finally:
         cursor.close()
         conn.close()
-        return True
+        # return True
 
 def fetch_user_progress(user_id):
     # conn = mysql.connector.connect(
@@ -75,7 +74,8 @@ def fetch_user_progress(user_id):
 def plot_progress(dataframe):
     # Create a figure with 2 rows and 3 columns
     #fig, axes = plt.subplots(5, 1, figsize=(30, 30))  # 5 rows, 1 columns
-
+    
+    dataframe = dataframe.groupby('Lesson')['Score'].max().reset_index()[['Lesson','Score']]
     # Line Plot
     fig1 = plt.figure(figsize=(10, 5))
     plt.plot(dataframe["Lesson"], dataframe["Score"], marker="o", color="b")
@@ -148,7 +148,7 @@ def dashboard():
         topic = st.text_input("Enter Topic (e.g., Python Loops, Calculus Derivatives)")
         num_questions = st.slider("Number of Questions", 1, 20, 5)
         if st.button("Generate Exercises"):
-            result = log_progress(101,topic,8)
+            result = log_progress(,topic,88)
             # if result ==True:
             #     pass
             prompt = f"Create {num_questions} practice questions with answers on {topic}."

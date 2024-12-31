@@ -101,8 +101,8 @@ def financial():
     st.write(response)
 
     # Footer section
-    st.markdown("---")
-    st.markdown("© 2024 My Chat Application | All rights reserved. Develop by jroshan")
+    # st.markdown("---")
+    # st.markdown("© 2024 My Chat Application | All rights reserved. Develop by jroshan")
     
     
 # # Main

@@ -1,7 +1,7 @@
 import streamlit as st
 from PIL import Image
 
-def home():
+def index():
     # Page title
     st.title("Home Page")
     st.subheader("Welcome to My Chat Boart Application!")
@@ -55,4 +55,4 @@ def home():
     st.markdown("---")
     st.markdown("© 2024 My Chat Application | All rights reserved. Develop by jroshan")
 
-home()
+index()
