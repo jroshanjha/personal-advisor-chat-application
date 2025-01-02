@@ -17,3 +17,7 @@ conda activate venv/
 pip install -r requirements.txt
 
 streamlit run app.py
+
+
+web: streamlit run app.py
+streamlit run streamlit_app.py --server.port $PORT

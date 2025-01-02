@@ -53,9 +53,9 @@ def get_gemini_response(text):
     response = model.generate_content(text)
     return response.text
 def log_progress(user_id, lesson_name, score):
+    conn = get_db_conn()
+    cursor = conn.cursor()
     try:
-        conn = get_db_conn()
-        cursor = conn.cursor()
         #cursor.execute("use learning_model")
         cursor.execute("""
             INSERT INTO progress (user_id, lesson_name, score)
@@ -80,14 +80,19 @@ def fetch_user_progress(user_id):
     # cursor = conn.cursor()
     conn = get_db_conn()
     cursor = conn.cursor()
-    cursor.execute("""
-        SELECT lesson_name, score, timestamp
-        FROM progress
-        WHERE user_id = %s
-        ORDER BY timestamp DESC
-    """, (user_id,))
-    rows = cursor.fetchall()
-    conn.close()
+    try:
+        cursor.execute("""
+            SELECT lesson_name, score, timestamp
+            FROM progress
+            WHERE user_id = %s
+            ORDER BY timestamp DESC
+        """, (user_id,))
+        rows = cursor.fetchall()
+    except mysql.connector.Error as err:
+        st.error(f"Error: {err}")
+    finally:
+        cursor.close()    
+        conn.close()
     return pd.DataFrame(rows, columns=["Lesson", "Score", "Timestamp"])
 
 def plot_progress(dataframe):

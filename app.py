@@ -28,10 +28,9 @@ def check_password(password, hashed_password):
 # Add New User
 def register_user(username, password):
     hashed = hash_password(password)
+    conn = get_db_connection()
+    cursor = conn.cursor()
     try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-
         # Check if the username already exists
         cursor.execute("SELECT COUNT(*) FROM users WHERE username = %s", (username,))
         user_exists = cursor.fetchone()[0]
@@ -55,14 +54,16 @@ def register_user(username, password):
 
 # Authenticate User
 def authenticate_user(username, password):
+    conn = get_db_connection()
+    cursor = conn.cursor()
     try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
         cursor.execute("SELECT password FROM users WHERE username = %s", (username,))
         user = cursor.fetchone()
         if user and check_password(password, user[0]):
             return True
         return False
+    except mysql.connector.Error as err:
+        st.error(f"Error: {err}")
     finally:
         cursor.close()
         conn.close()
