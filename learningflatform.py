@@ -15,7 +15,10 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 # words embedding means convert into word vectorized 
 from langchain_google_genai import GoogleGenerativeAIEmbeddings,ChatGoogleGenerativeAI
 # from langchain.llms import GoogleGenerativeAI
-from langchain.vectorstores import FAISS 
+#from langchain.vectorstores import FAISS 
+# New Import
+from langchain_community.vectorstores import FAISS
+
 from langchain.chains.question_answering import load_qa_chain 
 from langchain.prompts import PromptTemplate
 
