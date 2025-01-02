@@ -15,7 +15,7 @@ db_config = {
     "user": "root",  # Replace with your MySQL username
     "password": "jroshan@98",  # Replace with your MySQL password
     "database": "learning_model", # Replace with your MySQL database name
-    "port":3306
+    "port":111
 }
 
 # db_config = {
