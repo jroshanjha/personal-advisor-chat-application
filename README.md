@@ -16,8 +16,22 @@ conda activate venv/
 # installment Requirements Library
 pip install -r requirements.txt
 
+# Procfile
 streamlit run app.py
 
-
+# For render.com
 web: streamlit run app.py
 streamlit run streamlit_app.py --server.port $PORT
+
+
+
+# Procfile
+web: gunicorn app:app
+
+# requirements.txt
+flask
+gunicorn
+
+# For Render.com:
+# Build command: pip install -r requirements.txt
+# Start command: gunicorn app:app

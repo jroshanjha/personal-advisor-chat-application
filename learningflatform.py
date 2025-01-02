@@ -33,21 +33,21 @@ def get_gemini_response_store(question,k):
         response=l_chat.send_message(question,stream=True)
         return response
 # MySQL Connection Configuration :- begin configuration:-
-db_config = {
-    "host": "localhost",
-    "user": "root",  # Replace with your MySQL username
-    "password": "jroshan@98",  # Replace with your MySQL password
-    "database": "learning_model"  # Replace with your MySQL database name
-}
-
+# db_config = {
+#     "host": "localhost",
+#     "user": "root",  # Replace with your MySQL username
+#     "password": "jroshan@98",  # Replace with your MySQL password
+#     "database": "learning_model"  # Replace with your MySQL database name
+# }
 # connect Mysql:-
 def get_db_conn():
     #return mysql.connector.connect(**db_config)
     return mysql.connector.connect(
-        host="localhost",
+        host="127.0.0.1",
         user="root",
         password="jroshan@98",
-        database="learning_model"
+        database="learning_model",
+        port =3306
     )
 def get_gemini_response(text):
     response = model.generate_content(text)

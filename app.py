@@ -5,16 +5,26 @@ import learningflatform
 from travel import t_ravel
 from finance import financial
 from medical import medical_method
+import os
 # from pages.home import index
 # from pages.about import about
 
 # MySQL Connection Configuration :- begin configuration:-
 db_config = {
-    "host": "localhost",
+    "host": "127.0.0.1",
     "user": "root",  # Replace with your MySQL username
     "password": "jroshan@98",  # Replace with your MySQL password
-    "database": "learning_model"  # Replace with your MySQL database name
+    "database": "learning_model", # Replace with your MySQL database name
+    "port":3306
 }
+
+# db_config = {
+#     'host': os.getenv('9TNMY74'),
+#     'user': os.getenv('root'),
+#     'password': os.getenv('jroshan@98'),
+#     'database': os.getenv('learning_model'),
+#     'port': 3306,
+# }
 
 # Connect to MySQL
 def get_db_connection():
