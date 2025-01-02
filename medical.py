@@ -15,13 +15,17 @@ import json
 
 load_dotenv()
 ## configure the api key:-
-genai.configure(api_key=os.getenv("GOOGLE_API_SERVICE"))
+genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 model = genai.GenerativeModel("gemini-pro")
 
 def get_gemini_response(text):
     response = model.generate_content(text)
     return response.text
-   
+m_chat = model.start_chat(history=[])
+def get_gemini_response_store(question,k):
+    if k=='m':
+        response=m_chat.send_message(question,stream=True)
+        return response  
 def fetch_drug_info(drug_name):
     url = f"https://api.fda.gov/drug/label.json?search=openfda.brand_name:{drug_name}"
     response = requests.get(url)
@@ -49,14 +53,13 @@ def extract_text_from_docx(uploaded_file):
         text += paragraph.text + "\n"
     return text
 
-def extract_text_from_docx(uploaded_file):
-    """
-    Extract text from a .docx file.
-    """
-    doc = docx.Document(uploaded_file)
-    text = "\n".join(paragraph.text for paragraph in doc.paragraphs)
-    return text
-
+# def extract_text_from_docx(uploaded_file):
+#     """
+#     Extract text from a .docx file.
+#     """
+#     doc = docx.Document(uploaded_file)
+#     text = "\n".join(paragraph.text for paragraph in doc.paragraphs)
+#     return text
 
 def analyze_content(content, file_type=None):
     """
@@ -146,41 +149,49 @@ def process_file(uploaded_file):
 
     return extracted_content, file_extension
 
+if 'mchat_history' not in st.session_state:
+    st.session_state['mchat_history'] = []
+    
 def medical_method():
     # Title
     #st.set_page_config("AI-Powered Medical Diagnostic Tool 🩺")
     st.title("Welcome to Medical Diagnostic Tool 🩺")
-
     # Sidebar Menu
     menu = st.sidebar.radio("Menu", ["Symptom Diagnosis","File Summary","Drug Information", "Healthcare Finder"])
     prompt = "Tell me about Medical Diagnostic Tool"
-    
     if menu == "Symptom Diagnosis":
         st.header("Symptom Diagnosis")
         symptoms = st.text_area("Enter your symptoms (e.g., fever, headache, fatigue)")
         
-        
         if st.button("Get Diagnosis"):
             prompt = f"Given the symptoms: {symptoms}, provide a list of possible diagnoses and recommended actions."
-            st.write("**Possible Diagnoses and Recommendations:**")
-            
-            response = get_gemini_response(prompt)
-            #st.subheader('The response Output:-')
-            st.write(response)
+            st.write("----------------------------------------------------------------")
+            st.write(f"**Possible Diagnoses and Recommendations: for {symptoms}**")
+            st.write("----------------------------------------------------------------")
+            #response = get_gemini_response(prompt)
+            response = get_gemini_response_store(prompt,'m')
+            st.session_state['mchat_history'].append(("You", symptoms))
+            st.subheader("The Response is")
+            for chunk in response:
+                st.write(chunk.text)
+                st.session_state['mchat_history'].append(("Bot", chunk.text))
+                
+        st.subheader("The Chat History is")
+        for role, text in st.session_state['mchat_history']:
+            st.write(f"{role}: {text}")
 
     elif menu =='File Summary':
         # Streamlit App
         st.title("Dynamic File and Text Analysis")
-
         # Upload file
         uploaded_file = st.file_uploader("Upload any file", type=None)
-
         # User-provided text input
         #user_input = st.text_area("Enter additional text for analysis or comments", height=150)
-
         # Process uploaded file
         if uploaded_file:
+            st.write("----------------------------------------------------------------")
             st.write(f"**Uploaded File:** {uploaded_file.name}")
+            st.write("----------------------------------------------------------------")
             file_content, file_type = process_file(uploaded_file)
 
             # Perform analysis on file content
@@ -198,17 +209,18 @@ def medical_method():
     elif menu == "Drug Information":
         st.header("Drug Information")
         drug_name = st.text_input("Enter the drug name")
-        
         if st.button("Search Drug Info"):
             if drug_name:  # Ensure a drug name is entered
-                #data = fetch_drug_info(drug_name)
+                data = fetch_drug_info(drug_name)
                 prompt = f"Give me depth idea about Grug Information:- {drug_name}"
                 # if "error" not in data:  # Check for errors in the API response
                 #     st.write("**Drug Information:**")
                 #     prompt = st.json(data)  # Display the drug data in JSON format
                 # else:
                 #     st.error(data.get("error", "Unable to fetch drug information."))
-                st.write("**Drug Information:**")
+                st.write("----------------------------------------------------------------")
+                st.write(f"**Drug Information: about {drug_name}**")
+                st.write("----------------------------------------------------------------")
                 # prompt = st.json(data)
                 #st.write("Fetching drug information... (Replace this with an API call to OpenFDA)")
                 # Example: Use OpenFDA API for real-time drug data
@@ -216,7 +228,7 @@ def medical_method():
                 st.warning("Please enter a drug name.")
                 
             response = get_gemini_response(prompt)
-            #st.subheader('The response Output:-')
+            st.subheader('The response Output:-')
             st.write(response)        
         
     elif menu == "Healthcare Finder":
@@ -226,8 +238,10 @@ def medical_method():
         
         if st.button("Search Providers"):
             providers = fetch_healthcare_providers(location, specialization)
-            prompt = f"Search My Health Care Findre for Locations:-{location} and specialication:- {specialization}"
+            prompt = f"Search My Health Care Finder for Locations:-{location} and specialication:- {specialization}"
+            st.write("----------------------------------------------------------------")
             st.write("** Health Care Information:**")
+            st.write("----------------------------------------------------------------")
             # for provider in providers.get("results", []):
             #     st.write(f"Name: {provider['name']}")
             #     st.write(f"Address: {provider['formatted_address']}")
@@ -237,13 +251,8 @@ def medical_method():
             # Placeholder: Implement Zocdoc or similar API integration
         
             response = get_gemini_response(prompt)
-            #st.subheader('The response Output:-')
+            st.subheader('The response Output:-')
             st.write(response)
-    
-    # response = get_gemini_response(prompt)
-    # #st.subheader('The response Output:-')
-    # st.write(response)
-    
 # Main
 if __name__ == "__main__":
     medical_method()

@@ -24,6 +24,11 @@ load_dotenv()
 genai.configure(api_key=os.getenv("GOOGLE_API_SERVICE"))
 model = genai.GenerativeModel("gemini-pro")
 
+l_chat = model.start_chat(history=[])
+def get_gemini_response_store(question,k):    
+    if k=='l':
+        response=l_chat.send_message(question,stream=True)
+        return response
 # MySQL Connection Configuration :- begin configuration:-
 db_config = {
     "host": "localhost",
@@ -188,58 +193,88 @@ def user_input(user_question):
     print(response)
     st.write("Reply: ", response["output_text"])
     
-
+# Initialize session state for chat history if it doesn't exist
+if 'lchat_history' not in st.session_state:
+    st.session_state['lchat_history'] = []
+    
 def dashboard():
     #st.set_page_config("AI-Powered Learning Platform 📚")
     # App Title
     st.title("Welcome to AI-Powered Learning Platform 📚")
     # Sidebar Menu
     menu = st.sidebar.radio("Menu", ["Personalized Lessons","Practice Exercises", "Question Answering","AI Tutor","Flash Card" ,"Lesson Recommendations","Progress Tracker"])
-    
     prompt = "Tell me about Learning Platform"
-    
     if menu == "Personalized Lessons":
         st.header("Generate Personalized Lessons")
         subject = st.text_input("Enter Subject (e.g., Python, Calculus, History)")
         level = st.selectbox("Select Difficulty Level", ["Beginner", "Intermediate", "Advanced"])
         goal = st.text_area("What would you like to learn?")
-
         if st.button("Generate Lesson"):
             prompt = f"Create a detailed lesson on {subject} at a {level} level. Learning goal: {goal}."
-            st.write("### Lesson Content:")
-
+            st.write("----------------------------------------------------------------")
+            st.write(f"### Lesson Content: for {subject} , {level} and {goal} :-")
+            st.write("----------------------------------------------------------------")
+            response = get_gemini_response(prompt)
+            st.subheader('The response Output:-')
+            st.write(response)
+            
     elif menu == "Practice Exercises":
         st.header("Practice Exercises")
         topic = st.text_input("Enter Topic (e.g., Python Loops, Calculus Derivatives)")
         num_questions = st.slider("Number of Questions", 1, 20, 5)
         if st.button("Generate Exercises"):
-            result = log_progress('user_1',topic,88)
-            # if result ==True:
-            #     pass
+            result = log_progress(st.session_state.username,topic,88)
             prompt = f"Create {num_questions} practice questions with answers on {topic}."
-            st.write("### Practice Questions:")
-
+            st.write("----------------------------------------------------------------")
+            st.write(f"### Practice Questions: for {topic} :-")
+            st.write("----------------------------------------------------------------")
+            response = get_gemini_response(prompt)
+            st.subheader('The response Output:-')
+            st.write(response)
+        
     elif menu == "AI Tutor":
         st.header("Chat with the AI Tutor")
-        question = st.text_input("Ask a question about any topic (e.g., 'Explain Newton's second law')")
+        question = st.text_input("Ask a question about any topic (e.g., 'Explain Machine Learning or NLP')")
         if st.button("Get Answer"):
-            prompt = f"Explaine this topic in depth for interview and exam pointviews."
-            st.write("### Tutor's Answer:")
-
+            prompt = f"Explaine this topic {question} in depth for interview and exam pointviews."
+            st.write("----------------------------------------------------------------")
+            st.write(f"### Tutor's Answer: for {question} :-")
+            st.write("----------------------------------------------------------------")
+            response = get_gemini_response_store(prompt,'l')
+            #st.write(response)
+            # Add user query and response to session state chat history
+            st.session_state['lchat_history'].append(("You", question))
+            st.subheader("The Response is")
+            for chunk in response:
+                st.write(chunk.text)
+                st.session_state['lchat_history'].append(("Bot", chunk.text))
+        st.subheader("The Chat History is")
+        for role, text in st.session_state['lchat_history']:
+            st.write(f"{role}: {text}")   
+            
     elif menu =='Flash Card':
         topic = st.text_input("Enter Topic for Flashcards")
         if st.button("Generate Flashcards"):
             prompt = f"Create top 20 flashcards with questions and answers on {topic}."
+            st.write("----------------------------------------------------------------")
+            st.write(f"# Top 20 Flashcards Questions and Answers: for Topics:- {topic} :-")
+            st.write("----------------------------------------------------------------")
+            response = get_gemini_response(prompt)
+            st.subheader('The response Output:-')
+            st.write(response)
     elif menu=='Lesson Recommendations':
         c_lesson = st.text_input("Enter Your Complete Topics")
         if st.button("Recommendations Next Lesson!"):
-            prompt = f"I have Completes the lesson {c_lesson} and pleased recommendations"
-
+            prompt = f"I have Completes the lesson {c_lesson} and pleased Recommendations Next Lesson or Topic!"
+            st.write("----------------------------------------------------------------")
+            st.write(f'Recommedations Next Lesson and Topics: for {c_lesson} :-')
+            st.write("----------------------------------------------------------------")
+            response = get_gemini_response(prompt)
+            st.subheader('The response Output:-')
+            st.write(response)
     elif menu=='Question Answering':
         st.header("Chat with PDF File")
-        
         pdf_file = st.file_uploader("Upload your PDF Files and Click on the Submit & Process Button", accept_multiple_files=True,type=["pdf"]) # True
-        
         if st.button("Submit & Process"):
             if pdf_file:
                 with st.spinner("Processing..."):
@@ -249,7 +284,9 @@ def dashboard():
                     st.success("Done")
             else:
                 st.error("Please upload a PDF file")
+        st.write("----------------------------------------------------------------")        
         user_question = st.text_input("Ask a Question from the PDF Files")
+        st.write("----------------------------------------------------------------")
         if user_question:
             user_input(user_question)
 
@@ -260,17 +297,14 @@ def dashboard():
         if st.button("View Progress"):
             progress_df = fetch_user_progress(user_id)
             if not progress_df.empty:
-                st.write("### Progress Data:")
+                st.write("----------------------------------------------------------------")
+                st.subheader("### Progress Data:")
+                st.write("----------------------------------------------------------------")
                 st.dataframe(progress_df)
                 plot_progress(progress_df)
             else:
                 st.write("No progress data found!")
-                
-    response = get_gemini_response(prompt)
-    #st.subheader('The response Output:-')
-    st.write(response)
-    
-    
+
 # Main
 if __name__ == "__main__":
     dashboard()

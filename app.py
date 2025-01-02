@@ -82,8 +82,7 @@ def login():
             #learningflatform.dashboard()
             #home()
         else:
-            st.error("Invalid username or password.")
-            
+            st.error("Invalid username or password.")          
 # Register Form
 def register():
     st.title("Register")
@@ -97,7 +96,6 @@ def register():
     # if st.button("Back to Login"):
     #     st.session_state.page = "Login"
     #     st.rerun()
-
 # Logout section 
 def logout():
     if st.button("Logout"):
@@ -110,14 +108,14 @@ def logout():
         #st.session_state.page = "Login"
         # if "authenticated" not in st.session_state:
         #     navigation()
-        #st.session_state.authenticated = False
-        
+        #st.session_state.authenticated = False      
 # Dashboard
 def leaning():
-    #st.title("Dashboard")
-    #st.write(f"Welcome, {st.session_state.username}!")
+    st.title("Dashboard")
+    st.write(f"Welcome, {st.session_state.username}!")
     #st.dashboard()
-    learningflatform.dashboard()
+    learningflatform.dashboard()   
+    #learningflatform()
     
 # Navigation
 def navigation():
@@ -135,7 +133,7 @@ def navigation():
         "Medical Diagnostic":medical_method,
         "Logout":logout,
     }
-
+    st.set_page_config("Welcome Chat Application")
     # Sidebar for Navigation
     with st.sidebar:
         st.title("Navigation")
@@ -158,7 +156,6 @@ def navigation():
 #         login()
 #     elif menu == "Register":
 #         register()
-
 
 # # Streamlit Session State Management
 if "authenticated" not in st.session_state:

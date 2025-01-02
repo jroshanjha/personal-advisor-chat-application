@@ -8,24 +8,29 @@ import google.generativeai as genai
 
 load_dotenv()
 ## configure the api key:-
-genai.configure(api_key=os.getenv("GOOGLE_API_SERVICE"))
+genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
 model = genai.GenerativeModel("gemini-pro")
 
+t_chat = model.start_chat(history=[])
 def get_gemini_response(text):
     response = model.generate_content(text)
     return response.text
+def get_gemini_response_store(question,k):
+    if k=='t':
+        response=t_chat.send_message(question,stream=True)
+        return response
 
+if 'tchat_history' not in st.session_state:
+    st.session_state['tchat_history'] = []
+    
 def t_ravel():
     ##title for title bar:- 
     ##st.set_page_config("Smart Travel Planner 🌍")  
     # Page title
-    # Title
     st.title("Welcome to Smart Travel Planner 🌍")
-
     # Sidebar Menu
     menu = st.sidebar.radio("Menu", ["Plan Itinerary", "Flights & Hotels", "Local Recommendations", "Packing List", "Travel Chat"])
-
     prompt = "Tell me about Travel Planner"
     if menu == "Plan Itinerary":
         st.header("Plan Your Itinerary")
@@ -36,7 +41,12 @@ def t_ravel():
 
         if st.button("Generate Itinerary"):
             prompt = f"Plan a detailed trip itinerary for {destination} from {start_date} to {end_date}. Preferences: {preferences}."
-
+            st.write("----------------------------------------------------------------")
+            st.write(f"Generate Itinerary plan for {destination} from {start_date} to {end_date}. Preferences: {preferences}.")
+            st.write("----------------------------------------------------------------")
+            response = get_gemini_response(prompt)
+            st.subheader('The response Output:-')
+            st.write(response)
 
     elif menu == "Flights & Hotels":
         st.header("Find Flights and Hotels")
@@ -48,13 +58,25 @@ def t_ravel():
         if st.button("Search Deals"):
             prompt = f"Search Flights and Hotels for Departure {origin} , Designation {destination} and departure date {departure_date} , Return Date {return_date} "
             #st.write("Fetching deals... (Integrate with Skyscanner or Expedia API here)")
-
+            st.write("----------------------------------------------------------------")
+            st.write(f"Flights & Hotels Services: for details departure city {origin} and Destination city {destination} and Departure Date{departure_date} and Return Date{return_date}")
+            st.write("----------------------------------------------------------------")
+            response = get_gemini_response(prompt)
+            st.subheader('The response Output:-')
+            st.write(response)
+            
     elif menu == "Local Recommendations":
         st.header("Discover Local Attractions")
         location = st.text_input("Enter Location")
         if st.button("Get Recommendations"):
             prompt = f"Suggest top attractions, restaurants, and activities in {location}."
-
+            st.write("----------------------------------------------------------------")
+            st.write(f"Discover Local Attractions in {location}.")
+            st.write("----------------------------------------------------------------")
+            response = get_gemini_response(prompt)
+            st.subheader('The response Output:-')
+            st.write(response)
+            
     elif menu == "Packing List":
         st.header("Packing List Generator")
         destination = st.text_input("Destination")
@@ -63,21 +85,40 @@ def t_ravel():
 
         if st.button("Generate Packing List"):
             prompt = f"Create a packing list for a trip to {destination}. Dates: {travel_dates}. Activities: {activity_type}."
-
+            st.write("----------------------------------------------------------------")
+            st.write(f"Packing List for {destination} from {travel_dates}. Activities: {activity_type}.")
+            st.write("----------------------------------------------------------------")
+            
+            response = get_gemini_response(prompt)
+            st.subheader('The response Output:-')
+            st.write(response)
+            
     elif menu == "Travel Chat":
         st.header("Ask Your Travel Assistant")
         question = st.text_input("Ask a question about your trip")
         if st.button("Get Answer"):
             prompt = question
+            st.write("----------------------------------------------------------------")
+            st.write(f"Chat System response: for {question} :-")
+            st.write("----------------------------------------------------------------")
+            response = get_gemini_response_store(prompt,'t')
             # response = openai.Completion.create(
             #     engine="text-davinci-003", prompt=question, max_tokens=150
             # )
             # st.write(response['choices'][0]['text'])
-
-    response = get_gemini_response(prompt)
-    st.subheader('The response Output:-')
-    st.write(response)
-    
+            st.session_state['tchat_history'].append(("You", question))
+            st.subheader("The Response is")
+            for chunk in response:
+                st.write(chunk.text)
+                st.session_state['tchat_history'].append(("Bot", chunk.text))
+                
+        st.subheader("The Chat History is")
+        for role, text in st.session_state['tchat_history']:
+            st.write(f"{role}: {text}") 
+                    
+            # response = get_gemini_response(prompt)
+            # st.subheader('The response Output:-')
+            # st.write(response)
 # Main
 if __name__ == "__main__":
     t_ravel()

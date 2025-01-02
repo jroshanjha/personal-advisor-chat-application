@@ -55,3 +55,4 @@ build/
 # Git folder ignore
 .git/
 .faiss_index/
+.codegpt

@@ -4,7 +4,7 @@ python-dotenv
 langchain_google_genai
 gunicorn
 langchain_community
-openai
+# openai
 google-cloud-aiplatform>=1.38
 
 numpy==1.24.3
