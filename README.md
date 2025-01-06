@@ -89,5 +89,6 @@ gunicorn
 
 
 ## .env file configuations:-
+Creatr .env file and past there...
 GOOGLE_API_KEY ="AIzaSyCKnIRMMdFQtgP6C77T3EdmoL9R_wW7m0g"
 GOOGLE_API_SERVICE ="AIzaSyCWsS5zmsstSDipuLUHyfVLFP-1LkcVlxs"

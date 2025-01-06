@@ -5,6 +5,7 @@ __pycache__/
 *.pyd
 *.py[co]
 
+faiss_index
 # Environment Files
 .env
 *.env
