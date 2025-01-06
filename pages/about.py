@@ -20,10 +20,10 @@ def about():
     # Core values
     st.header("Our Core Values")
     core_values = {
-        "💡 Innovation": "We embrace creativity and strive for continuous improvement.",
-        "👥 Collaboration": "We believe in teamwork and open communication.",
-        "📈 Excellence": "We deliver top-notch solutions with quality in mind.",
-        "🌱 Sustainability": "We care about the environment and sustainable practices.",
+        "💡 EDA": " How to Python - Numpy, Pandas , Matplotlib and Seaborn are used to Perform EDA operations.",
+        "👥 Machine Leraning ": "Find Trend and Pattern for better future Business Decisions.",
+        "📈 NLP": "When I have Textual Data Then I go with NLP for Sentiment Analysis , Topic Modeling and Questions & Answering.",
+        "🌱 Deep Learning": "When I have Image or Vidoe or Even Huge amout of text data then go with Deep Learning technique( ANN, RNN and CNN ) .",
     }
     for key, value in core_values.items():
         st.markdown(f"**{key}**: {value}")
@@ -48,19 +48,20 @@ def about():
     st.header("Our Journey")
     st.markdown(
         """
-        - **2018**: Founded with a mission to innovate.
-        - **2019**: Launched our first successful product.
-        - **2021**: Expanded globally with 10k+ users.
-        - **2024**: Introducing cutting-edge analytics tools.
+        - **2018**: Take Admission in BCA ( Bachelor of Computer Application) Ignou.
+        - **2022**: Launched our Own Education Insitute.
+        - **2022**: Join XYZ Company As Software Developer Internships.
+        - **2023**: Join XYZ Company As Software Developer full time jobs.
+        - **2025**: Decided to Start or Swith my career in Data Science Domain.
         """
     )
 
     # Interactive FAQ
     st.header("Frequently Asked Questions (FAQ)")
     faq = {
-        "What services do you offer?": "We provide data visualization, analytics, and dashboarding solutions.",
+        "What services do you offer?": "We provide data visualization, analytics, and dashboarding solutions & Machine learning techniques, NLP techniques ,Generative AI.",
         "How can I contact you?": "Visit our Contact page for details.",
-        "Are your tools free to use?": "We offer both free and premium plans.",
+        "Are your tools free to use?": "We offer both free and premium plans.( just only Registered & Login)",
     }
     for question, answer in faq.items():
         with st.expander(question):
@@ -69,6 +70,6 @@ def about():
 #about()
     # Footer section
     st.markdown("---")
-    st.markdown("© 2024 My Chat Application | All rights reserved. Develop by jroshan")
+    st.markdown("© 2024-2025 Personal Advisor Chat Application | All rights reserved. Developed by jroshan")
     
 about()

@@ -103,7 +103,6 @@ def register():
         register_user(username, password)
         #st.session_state.page = "Login"
         #st.rerun()
-        
     # if st.button("Back to Login"):
     #     st.session_state.page = "Login"
     #     st.rerun()

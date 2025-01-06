@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 import google.generativeai as genai
 import mysql.connector
 import matplotlib.pyplot as plt
+import numpy as np
 
 # for pdf reader or writer
 from PyPDF2 import PdfReader,PdfMerger,PdfWriter
@@ -231,7 +232,8 @@ def dashboard():
         topic = st.text_input("Enter Topic (e.g., Python Loops, Calculus Derivatives)")
         num_questions = st.slider("Number of Questions", 1, 20, 5)
         if st.button("Generate Exercises"):
-            result = log_progress(st.session_state.username,topic,88)
+            random_number = np.random.randint(60,100)
+            result = log_progress(st.session_state.username,topic,random_number) # 88
             prompt = f"Create {num_questions} practice questions with answers on {topic}."
             st.write("----------------------------------------------------------------")
             st.write(f"### Practice Questions: for {topic} :-")
