@@ -87,7 +87,6 @@ gunicorn
 # Build command: pip install -r requirements.txt
 # Start command: gunicorn app:app
 
-
 ## .env file configuations:-
 Creatr .env file and past there...
 GOOGLE_API_KEY ="AIzaSyCKnIRMMdFQtgP6C77T3EdmoL9R_wW7m0g"

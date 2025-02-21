@@ -184,3 +184,6 @@ if __name__ == "__main__":
     # Footer section
     st.markdown("---")
     st.markdown("© 2024 My Chat Application | All rights reserved. Developed by jroshan")
+
+
+## st.sidebar.selectbox("Menu", ["Login", "Register"])

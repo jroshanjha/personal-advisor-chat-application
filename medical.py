@@ -81,7 +81,7 @@ def analyze_content(content, file_type=None):
     elif file_type in ["csv", "xlsx"]:
         st.write("**Data Summary**")
         st.write(content.describe())
-
+        
     elif file_type == "json":
         st.write("**JSON Structure**")
         st.json(content)

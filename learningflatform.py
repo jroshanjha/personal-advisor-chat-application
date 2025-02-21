@@ -9,6 +9,7 @@ import mysql.connector
 import matplotlib.pyplot as plt
 import numpy as np
 
+
 # for pdf reader or writer
 from PyPDF2 import PdfReader,PdfMerger,PdfWriter
 # for pdf text splitter
@@ -22,6 +23,7 @@ from langchain_community.vectorstores import FAISS
 
 from langchain.chains.question_answering import load_qa_chain 
 from langchain.prompts import PromptTemplate
+
 
 load_dotenv()
 ## configure the api key:-
@@ -198,7 +200,6 @@ def user_input(user_question):
         {"input_documents":docs, "question": user_question}
         , return_only_outputs=False)
     
-    
     print(response)
     st.write("Reply: ", response["output_text"])
     
@@ -230,7 +231,7 @@ def dashboard():
     elif menu == "Practice Exercises":
         st.header("Practice Exercises")
         topic = st.text_input("Enter Topic (e.g., Python Loops, Calculus Derivatives)")
-        num_questions = st.slider("Number of Questions", 1, 20, 5)
+        num_questions = st.slider("Number of Questions", 1, 100, 5)
         if st.button("Generate Exercises"):
             random_number = np.random.randint(60,100)
             result = log_progress(st.session_state.username,topic,random_number) # 88
@@ -265,9 +266,9 @@ def dashboard():
     elif menu =='Flash Card':
         topic = st.text_input("Enter Topic for Flashcards")
         if st.button("Generate Flashcards"):
-            prompt = f"Create top 20 flashcards with questions and answers on {topic}."
+            prompt = f"Create top 100 flashcards with questions and answers on {topic}."
             st.write("----------------------------------------------------------------")
-            st.write(f"# Top 20 Flashcards Questions and Answers: for Topics:- {topic} :-")
+            st.write(f"# Top 100 Flashcards Questions and Answers: for Topics:- {topic} :-")
             st.write("----------------------------------------------------------------")
             response = get_gemini_response(prompt)
             st.subheader('The response Output:-')

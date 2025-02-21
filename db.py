@@ -59,7 +59,6 @@ def create_database_and_table():
                                 password VARCHAR(255) NOT NULL,
                                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                             )
-
                        """)
         print("Table 'progress' created successfully!")
 
