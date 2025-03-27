@@ -57,3 +57,4 @@ build/
 .git/
 .faiss_index/
 .codegpt
+.qodo

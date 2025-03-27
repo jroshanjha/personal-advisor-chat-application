@@ -9,6 +9,9 @@ import mysql.connector
 import matplotlib.pyplot as plt
 import numpy as np
 
+# Store and index data in multi dimensional vectors.
+# Chroma , milves, Pipecone , Faiss 
+
 
 # for pdf reader or writer
 from PyPDF2 import PdfReader,PdfMerger,PdfWriter
