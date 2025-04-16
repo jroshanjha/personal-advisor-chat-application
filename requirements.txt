@@ -12,6 +12,7 @@ google-cloud-aiplatform>=1.38
 numpy
 plotly
 matplotlib
+#matplotlib==3.3.4
 mysql-connector-python
 bcrypt
 # ---------------------------------------

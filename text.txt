@@ -367,3 +367,256 @@ if uploaded_file is not None:
         st.subheader("Extracted Information:")
         st.write(f"**Emails Found:** {emails if emails else 'None'}")
         st.write(f"**Phone Numbers Found:** {phone_numbers if phone_numbers else 'None'}")
+
+
+
+................................................................................................
+................................................................................................
+................................................................................................
+................................................................................................
+
+from datetime import date
+import streamlit as st
+import os
+from dotenv import load_dotenv
+import google.generativeai as genai
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain.embeddings import GoogleGenerativeAIEmbeddings
+
+# Load environment variables
+load_dotenv()
+
+# Check for API key
+api_key = os.getenv("GOOGLE_API_KEY")
+if not api_key:
+    st.error("Google API key not found. Please check your .env file.")
+genai.configure(api_key=api_key)
+
+# Initialize the model (No need for start_chat)
+model = ChatGoogleGenerativeAI(model="gemini-pro")
+embedding = GoogleGenerativeAIEmbeddings(model="embedding-001")
+
+# Function to get a response from Gemini
+def get_gemini_response(text):
+    try:
+        response = model.generate_content(text)  # Directly use generate_content for a response
+        return response.text
+    except Exception as e:
+        st.error(f"Error with API call: {e}")
+        return "Sorry, there was an issue processing your request."
+
+# Function to handle chat-based interactions
+def get_gemini_response_store(question):
+    try:
+        response = model.generate_content(question)  # Directly use generate_content for chat
+        return response.text
+    except Exception as e:
+        st.error(f"Error with API call: {e}")
+        return "Sorry, there was an issue processing your request."
+
+# Session state to store chat history
+if 'tchat_history' not in st.session_state:
+    st.session_state['tchat_history'] = []
+
+# Main Travel Planner Function
+def t_ravel():
+    st.title("Welcome to Smart Travel Planner 🌍")
+    
+    menu = st.sidebar.radio("Menu", ["Plan Itinerary", "Flights & Hotels", "Local Recommendations", "Packing List", "Travel Chat"])
+    
+    if menu == "Plan Itinerary":
+        st.header("Plan Your Itinerary")
+        destination = st.text_input("Enter Destination")
+        start_date = st.date_input("Start Date", min_value=date.today())
+        end_date = st.date_input("End Date", min_value=start_date)
+        preferences = st.text_area("Enter Your Preferences (e.g., museums, beaches, nightlife)")
+
+        if st.button("Generate Itinerary"):
+            prompt = f"Plan a detailed trip itinerary for {destination} from {start_date} to {end_date}. Preferences: {preferences}."
+            st.write("----------------------------------------------------------------")
+            st.write(f"Generate Itinerary plan for {destination} from {start_date} to {end_date}. Preferences: {preferences}.")
+            st.write("----------------------------------------------------------------")
+            response = get_gemini_response(prompt)
+            st.subheader('The response Output:-')
+            st.write(response)
+
+    elif menu == "Flights & Hotels":
+        st.header("Find Flights and Hotels")
+        origin = st.text_input("Departure City")
+        destination = st.text_input("Destination City")
+        departure_date = st.date_input("Departure Date", min_value=date.today())
+        return_date = st.date_input("Return Date", min_value=departure_date)
+
+        if st.button("Search Deals"):
+            prompt = f"Search Flights and Hotels for Departure {origin} , Designation {destination} and departure date {departure_date} , Return Date {return_date} "
+            st.write("----------------------------------------------------------------")
+            st.write(f"Flights & Hotels Services: for details departure city {origin} and Destination city {destination} and Departure Date{departure_date} and Return Date{return_date}")
+            st.write("----------------------------------------------------------------")
+            response = get_gemini_response(prompt)
+            st.subheader('The response Output:-')
+            st.write(response)
+            
+    elif menu == "Local Recommendations":
+        st.header("Discover Local Attractions")
+        location = st.text_input("Enter Location")
+        if st.button("Get Recommendations"):
+            prompt = f"Suggest top attractions, restaurants, and activities in {location}."
+            st.write("----------------------------------------------------------------")
+            st.write(f"Discover Local Attractions in {location}.")
+            st.write("----------------------------------------------------------------")
+            response = get_gemini_response(prompt)
+            st.subheader('The response Output:-')
+            st.write(response)
+            
+    elif menu == "Packing List":
+        st.header("Packing List Generator")
+        destination = st.text_input("Destination")
+        travel_dates = st.date_input("Travel Dates", min_value=date.today())
+        activity_type = st.text_area("Activities (e.g., hiking, formal events)")
+
+        if st.button("Generate Packing List"):
+            prompt = f"Create a packing list for a trip to {destination}. Dates: {travel_dates}. Activities: {activity_type}."
+            st.write("----------------------------------------------------------------")
+            st.write(f"Packing List for {destination} from {travel_dates}. Activities: {activity_type}.")
+            st.write("----------------------------------------------------------------")
+            response = get_gemini_response(prompt)
+            st.subheader('The response Output:-')
+            st.write(response)
+            
+    elif menu == "Travel Chat":
+        st.header("Ask Your Travel Assistant")
+        question = st.text_input("Ask a question about your trip")
+        if st.button("Get Answer"):
+            prompt = question
+            st.write("----------------------------------------------------------------")
+            st.write(f"Chat System response: for {question} :-")
+            st.write("----------------------------------------------------------------")
+            response = get_gemini_response_store(prompt)
+            st.session_state['tchat_history'].append(("You", question))
+            st.subheader("The Response is")
+            st.write(response)
+            st.session_state['tchat_history'].append(("Bot", response))
+                
+        st.subheader("The Chat History is")
+        for role, text in st.session_state['tchat_history']:
+            st.write(f"{role}: {text}")
+
+# Main function to run the app
+if __name__ == "__main__":
+    t_ravel()
+
+.................................
+............................................
+########################################################
+
+from langchain.memory import ConversationBufferMemory
+from langchain.chains import ConversationalRetrievalChain
+from langchain.vectorstores import FAISS  # or any other retriever
+from langchain.embeddings import GoogleGenerativeAIEmbeddings
+from langchain_google_genai import ChatGoogleGenerativeAI
+import os
+
+# Set your API key
+os.environ["GOOGLE_API_KEY"] = "your-api-key"
+
+# Load your LLM
+llm = ChatGoogleGenerativeAI(model="gemini-pro")
+
+# Create memory to store chat history
+memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+
+# Set up embedding and retriever (just an example, can be your own)
+embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+
+# Dummy retriever (use your own FAISS/Chroma/etc.)
+from langchain.vectorstores import FAISS
+from langchain.document_loaders import TextLoader
+from langchain.text_splitter import CharacterTextSplitter
+
+# Assume some sample docs
+docs = ["Paris is the capital of France.", "The Eiffel Tower is in Paris."]
+from langchain.schema import Document
+documents = [Document(page_content=d) for d in docs]
+
+# Build FAISS retriever
+text_splitter = CharacterTextSplitter(chunk_size=100, chunk_overlap=0)
+texts = text_splitter.split_documents(documents)
+db = FAISS.from_documents(texts, embeddings)
+retriever = db.as_retriever()
+
+# Create a Conversational Retrieval Chain with memory
+qa_chain = ConversationalRetrievalChain.from_llm(
+    llm=llm,
+    retriever=retriever,
+    memory=memory,
+)
+
+# Use the chain in a loop or Streamlit
+question = "What is the capital of France?"
+result = qa_chain.run(question)
+print("Q:", question)
+print("A:", result)
+
+# Follow-up
+followup = "What famous landmark is there?"
+result = qa_chain.run(followup)
+print("Q:", followup)
+print("A:", result)
+
+Q: What is the capital of France?
+A: Paris is the capital of France.
+
+Q: What famous landmark is there?
+A: The Eiffel Tower is a famous landmark in Paris.
+
+
+............
+...............
+.............
+
+.................
+
+
+import streamlit as st
+from langchain_google_genai import ChatGoogleGenerativeAI
+
+# Initialize model
+model = ChatGoogleGenerativeAI(model="gemini-pro")
+
+# Create chat instance with empty history
+if 't_chat' not in st.session_state:
+    st.session_state.t_chat = model.start_chat(history=[])
+
+# Initialize chat history to store and display
+if 'tchat_history' not in st.session_state:
+    st.session_state.tchat_history = []
+
+def get_gemini_response_store(question):
+    response = st.session_state.t_chat.send_message(question, stream=True)
+    return response
+
+# Streamlit app UI
+st.title("🔮 Gemini-Pro Chat")
+
+question = st.text_input("Ask something:", key="input")
+
+if question:
+    # Save user input
+    st.session_state.tchat_history.append(("You", question))
+
+    # Get response from Gemini
+    response = get_gemini_response_store(question)
+
+    st.subheader("💬 Response:")
+    full_response = ""
+    for chunk in response:
+        full_response += chunk.text
+        st.write(chunk.text)
+
+    # Save model response
+    st.session_state.tchat_history.append(("Bot", full_response))
+
+# Show chat history
+st.subheader("📜 Chat History:")
+for role, text in st.session_state.tchat_history:
+    st.markdown(f"**{role}:** {text}")

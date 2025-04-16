@@ -14,7 +14,7 @@ def render():
         }
         </style>
         <div class="footer">
-            <small>© 2024 My Streamlit App</small>
+            <small>© 2024-2025 My Streamlit App</small>
         </div>
         """,
         unsafe_allow_html=True

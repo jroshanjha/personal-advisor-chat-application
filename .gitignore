@@ -21,7 +21,7 @@ venv.bak/
 .stcache/
 .stpersist/
 *.log
-
+*.pdf
 # Jupyter Notebooks (if applicable)
 .ipynb_checkpoints/
 

@@ -16,15 +16,22 @@ import json
 load_dotenv()
 ## configure the api key:-
 genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-model = genai.GenerativeModel("gemini-pro")
+model = genai.GenerativeModel("gemini-1.5-pro-latest")
 
 def get_gemini_response(text):
     response = model.generate_content(text)
     return response.text
 m_chat = model.start_chat(history=[])
+chat_history = []
 def get_gemini_response_store(question,k):
     if k=='m':
         response=m_chat.send_message(question,stream=True)
+        response_text = ''.join([chunk.text for chunk in response])  # assuming it's streamed chunks
+        # Store at index 0
+        chat_history.insert(0, {
+            'question': question,
+            'response': response_text
+        })
         return response  
 def fetch_drug_info(drug_name):
     url = f"https://api.fda.gov/drug/label.json?search=openfda.brand_name:{drug_name}"
@@ -179,6 +186,10 @@ def medical_method():
         st.subheader("The Chat History is")
         for role, text in st.session_state['mchat_history']:
             st.write(f"{role}: {text}")
+        # for i, entry in enumerate(chat_history):
+        #     print(f"--- Message {i} ---")
+        #     print(f"Q: {entry['question']}")
+        #     print(f"A: {entry['response']}")
 
     elif menu =='File Summary':
         # Streamlit App

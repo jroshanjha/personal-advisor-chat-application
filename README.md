@@ -65,6 +65,7 @@ conda create -p venv python==3.11 -y
 # create Python Virtual Environment with python 3.11
 
 conda activate venv/
+venv\Scripts\activate
 
 # installment Requirements Library
 pip install -r requirements.txt

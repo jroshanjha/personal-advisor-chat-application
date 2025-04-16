@@ -21,9 +21,9 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_google_genai import GoogleGenerativeAIEmbeddings,ChatGoogleGenerativeAI
 # from langchain.llms import GoogleGenerativeAI
 #from langchain.vectorstores import FAISS 
+
 # New Import
 from langchain_community.vectorstores import FAISS
-
 from langchain.chains.question_answering import load_qa_chain 
 from langchain.prompts import PromptTemplate
 
@@ -31,7 +31,8 @@ from langchain.prompts import PromptTemplate
 load_dotenv()
 ## configure the api key:-
 genai.configure(api_key=os.getenv("GOOGLE_API_SERVICE"))
-model = genai.GenerativeModel("gemini-pro")
+#model = genai.GenerativeModel("gemini-pro")
+model = ChatGoogleGenerativeAI(model="gemini-pro")
 
 l_chat = model.start_chat(history=[])
 def get_gemini_response_store(question,k):    
@@ -191,6 +192,7 @@ def get_conversational_chain():
 
 def user_input(user_question):
     embedding_model = GoogleGenerativeAIEmbeddings(model = "models/embedding-001")
+    #embeddings = GoogleGenerativeAIEmbeddings(model="embedding-001")
     
     new_db = FAISS.load_local("faiss_index", embedding_model,
                              allow_dangerous_deserialization=True  # Enable this only if you trust the source

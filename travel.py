@@ -5,24 +5,50 @@ import pandas as pd
 import os
 from dotenv import load_dotenv
 import google.generativeai as genai
+from langchain_google_genai import ChatGoogleGenerativeAI , GoogleGenerativeAIEmbeddings
+from langchain.memory import ConversationBufferMemory
+from langchain.chains import ConversationalRetrievalChain
+from langchain.vectorstores import FAISS
+# from langchain.embeddings import GoogleGenerativeAIEmbeddings
 
 load_dotenv()
 ## configure the api key:-
 genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
-model = genai.GenerativeModel("gemini-pro")
+model = genai.GenerativeModel("gemini-1.5-pro-001")
+#model = ChatGoogleGenerativeAI(model="gemini-pro")
 
-t_chat = model.start_chat(history=[])
+# model = ChatGoogleGenerativeAI(
+#     model="gemini-pro",
+#     temperature=0.3,
+#     convert_system_message_to_human=True
+# )
+
+embedding = GoogleGenerativeAIEmbeddings(model="embedding-001")
+
+#t_chat = model.start_chat(history=[])
+
+# Initialize chat and history in session state
+if 't_chat' not in st.session_state:
+    st.session_state.t_chat = model.start_chat(history=[])
+    
+if 'tchat_history' not in st.session_state:
+    st.session_state.tchat_history = []
+    
 def get_gemini_response(text):
     response = model.generate_content(text)
     return response.text
 def get_gemini_response_store(question,k):
     if k=='t':
-        response=t_chat.send_message(question,stream=True)
+        #response=t_chat.send_message(question,stream=True)
+        response = st.session_state.t_chat.send_message(question, stream=True)
         return response
 
-if 'tchat_history' not in st.session_state:
-    st.session_state['tchat_history'] = []
+# Stream response from Gemini
+#response_stream = st.session_state.gemini_chat.send_message(user_input, stream=True)
+    
+# if 'tchat_history' not in st.session_state:
+#     st.session_state['tchat_history'] = []
     
 def t_ravel():
     ##title for title bar:- 
@@ -73,9 +99,33 @@ def t_ravel():
             st.write("----------------------------------------------------------------")
             st.write(f"Discover Local Attractions in {location}.")
             st.write("----------------------------------------------------------------")
-            response = get_gemini_response(prompt)
-            st.subheader('The response Output:-')
-            st.write(response)
+            #response = get_gemini_response(prompt)
+            response = get_gemini_response_store(prompt,'t')
+            #st.subheader('The response Output:-')
+            #st.write(response)
+           
+            #st.session_state['tchat_history'].append(("You", question))
+            st.session_state.tchat_history.append(("You", question))
+            
+            st.subheader("The Response is")
+            full_response = ""
+            for chunk in response:
+                full_response += chunk.text
+                st.write(chunk.text)
+                
+            st.session_state.tchat_history.append(("Bot", full_response))
+            # for chunk in response:
+            #     st.write(chunk.text)
+            #     st.session_state['tchat_history'].append(("Bot", chunk.text))
+                
+        # st.subheader("The Chat History is")
+        # for role, text in st.session_state['tchat_history']:
+        #     st.write(f"{role}: {text}")
+            
+        # Display full chat history
+        st.subheader("🕘 The Chat History is")
+        for role, message in st.session_state.tchat_history:
+            st.markdown(f"**{role}:** {message}")
             
     elif menu == "Packing List":
         st.header("Packing List Generator")
@@ -122,3 +172,6 @@ def t_ravel():
 # Main
 if __name__ == "__main__":
     t_ravel()
+
+
+

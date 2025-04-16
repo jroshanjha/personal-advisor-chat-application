@@ -51,6 +51,6 @@ def home():
 
     # Footer section
     st.markdown("---")
-    st.markdown("© 2024 Personal Advisor Chat Application | All rights reserved. Developed by jroshan")
+    st.markdown("© 2024-2025 Personal Advisor Chat Application | All rights reserved. Developed by jroshan")
 
 home()
