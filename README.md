@@ -3,6 +3,41 @@
 ## About this project 
 Designed and developed an interactive Personal-advisor-chat-application with features like Learning Platform,  Smart Travel Planner,  Personal Finance Advisor, and a Medical Diagnostic tool. Implemented a user-friendly frontend interface using Streamlit. Integrated the application with Gemini API and Google Services to provide seamless, real-time financial insights and recommendations. 
 
+# Tech Stack: Python, Flask, Streamlit, Gemini API, Google Services RAG for Questions and summarizations 
+
+ Building a Retrieval-Augmented Generation (RAG) system where combine local document knowledge (e.g., PDFs) with the power of LLMs like Gemini.  Python using LangChain, FAISS (for vector storage), and Google Generative AI (gemini-pro)
+
+ ✅ RAG Architecture Overview
+1. Load PDF documents
+
+2. Split them into chunks
+
+3. Generate embeddings for each chunk
+
+4. Store chunks in a vector database (FAISS)
+
+5. Query: Accept user question
+
+6. Retriever: Find relevant chunks
+
+7. Generator: Ask Gemini a question, grounded on retrieved chunks
+
+ 
+# 🛠 Designed and developed an interactive, AI-driven chat application acting as a multi-functional personal advisor.
+
+# 📚 Learning Platform – Delivers curated educational resources.
+
+# ✈️ Smart Travel Planner – Suggests travel itineraries and optimizes routes using Google Maps API.
+
+# 💰 Personal Finance Advisor – Provides real-time financial insights, budgeting tips, and investment suggestions using Gemini & Google Finance APIs.
+
+# 🏥 Medical Diagnostic Tool – Offers basic diagnostic suggestions (non-clinical) using symptom analysis and AI conversation.
+
+# 🎨 Built a user-friendly front-end using Streamlit, supporting dynamic interaction and personalized recommendations.
+
+# 🔗 Seamlessly connected with Gemini API and Google Services to ensure real-time, context-aware responses across modules.
+
+
 ## Frontend Features Like streamlit with layouts 
 Home 
 About us 
