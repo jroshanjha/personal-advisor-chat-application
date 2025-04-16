@@ -25,17 +25,17 @@ Designed and developed an interactive Personal-advisor-chat-application with fea
  
 # 🛠 Designed and developed an interactive, AI-driven chat application acting as a multi-functional personal advisor.
 
-# 📚 Learning Platform – Delivers curated educational resources.
+# Learning Platform – Delivers curated educational resources.
 
-# ✈️ Smart Travel Planner – Suggests travel itineraries and optimizes routes using Google Maps API.
+# Smart Travel Planner – Suggests travel itineraries and optimizes routes using Google Maps API.
 
-# 💰 Personal Finance Advisor – Provides real-time financial insights, budgeting tips, and investment suggestions using Gemini & Google Finance APIs.
+# Personal Finance Advisor – Provides real-time financial insights, budgeting tips, and investment suggestions using Gemini & Google Finance APIs.
 
-# 🏥 Medical Diagnostic Tool – Offers basic diagnostic suggestions (non-clinical) using symptom analysis and AI conversation.
+# Medical Diagnostic Tool – Offers basic diagnostic suggestions (non-clinical) using symptom analysis and AI conversation.
 
-# 🎨 Built a user-friendly front-end using Streamlit, supporting dynamic interaction and personalized recommendations.
+# Built a user-friendly front-end using Streamlit, supporting dynamic interaction and personalized recommendations.
 
-# 🔗 Seamlessly connected with Gemini API and Google Services to ensure real-time, context-aware responses across modules.
+# Seamlessly connected with Gemini API and Google Services to ensure real-time, context-aware responses across modules.
 
 
 ## Frontend Features Like streamlit with layouts 
