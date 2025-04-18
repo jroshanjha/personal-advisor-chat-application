@@ -22,9 +22,8 @@ genai.configure(api_key=os.getenv("GOOGLE_API_SERVICE"))
 #OPENAI_API_KEY = "your_openai_api_key"  # Replace with Gemini API key if applicable
 #openai.api_key = OPENAI_API_KEY
 
-
-#model = genai.GenerativeModel("learnlm-1.5-pro-experimental")
-model = genai.GenerativeModel("gemini-pro")
+model = genai.GenerativeModel("learnlm-1.5-pro-experimental")
+#model = genai.GenerativeModel("gemini-pro")
 #gemini-1.5-pro-001
 
 # # Sidebar navigation

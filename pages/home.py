@@ -1,5 +1,6 @@
 import streamlit as st
 from PIL import Image
+import database
 
 def home():
     # Page title
@@ -29,11 +30,15 @@ def home():
     for feature in features:
         st.write(feature)
     # Interactive element: Newsletter subscription
-    st.subheader("Subscribe to Our Learning Center")
+    #st.subheader("Subscribe to Our Learning Center")
+    st.title("📧 Subscribe to Our Learning Center")
     email = st.text_input("Enter your email address:")
     if st.button("Subscribe"):
         if email:
-            st.success(f"Thank you for subscribing, {email}!")
+            if database.insert_email(email):
+                st.success(f"Thank you for subscribing, {email}!")
+            else:
+              st.warning("⚠️ Email already subscribed.")
         else:
             st.error("Please enter a valid email address.")
 

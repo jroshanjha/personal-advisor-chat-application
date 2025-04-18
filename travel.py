@@ -26,7 +26,8 @@ model = genai.GenerativeModel("gemini-1.5-pro-001")
 
 embedding = GoogleGenerativeAIEmbeddings(model="embedding-001")
 
-#t_chat = model.start_chat(history=[])
+t_chat = model.start_chat(history=[])
+# r_chat = model.start_chat(history=[])
 
 # Initialize chat and history in session state
 if 't_chat' not in st.session_state:
@@ -35,6 +36,12 @@ if 't_chat' not in st.session_state:
 if 'tchat_history' not in st.session_state:
     st.session_state.tchat_history = []
     
+if 'r_chat' not in st.session_state:
+    st.session_state.r_chat = model.start_chat(history=[])
+    
+if 'rchat_history' not in st.session_state:
+    st.session_state.rchat_history = []
+    
 def get_gemini_response(text):
     response = model.generate_content(text)
     return response.text
@@ -42,7 +49,9 @@ def get_gemini_response_store(question,k):
     if k=='t':
         #response=t_chat.send_message(question,stream=True)
         response = st.session_state.t_chat.send_message(question, stream=True)
-        return response
+    if k =='r':
+        response = st.session_state.r_chat.send_message(question, stream=True)
+    return response
 
 # Stream response from Gemini
 #response_stream = st.session_state.gemini_chat.send_message(user_input, stream=True)
@@ -100,20 +109,21 @@ def t_ravel():
             st.write(f"Discover Local Attractions in {location}.")
             st.write("----------------------------------------------------------------")
             #response = get_gemini_response(prompt)
-            response = get_gemini_response_store(prompt,'t')
+            response = get_gemini_response_store(prompt,'r')
             #st.subheader('The response Output:-')
             #st.write(response)
-           
+            question = prompt
             #st.session_state['tchat_history'].append(("You", question))
-            st.session_state.tchat_history.append(("You", question))
+            st.session_state.rchat_history.append(("You", question))
+            st.session_state.rchat_history.append(("----------------------------------------------------------------", "")) # Fetching deals... (Integrate with Skyscanner or Expedia API here)
             
             st.subheader("The Response is")
             full_response = ""
             for chunk in response:
                 full_response += chunk.text
                 st.write(chunk.text)
-                
-            st.session_state.tchat_history.append(("Bot", full_response))
+            st.session_state.rchat_history.append(("Bot", full_response))
+            st.session_state.rchat_history.append(("-----------------------This is the end of the response-------------------------", ""))
             # for chunk in response:
             #     st.write(chunk.text)
             #     st.session_state['tchat_history'].append(("Bot", chunk.text))
@@ -124,7 +134,7 @@ def t_ravel():
             
         # Display full chat history
         st.subheader("🕘 The Chat History is")
-        for role, message in st.session_state.tchat_history:
+        for role, message in st.session_state.rchat_history:
             st.markdown(f"**{role}:** {message}")
             
     elif menu == "Packing List":
@@ -157,12 +167,14 @@ def t_ravel():
             # )
             # st.write(response['choices'][0]['text'])
             st.session_state['tchat_history'].append(("You", question))
+            st.session_state['tchat_history'].append(("----------------------------------------------------------------", ""))
             st.subheader("The Response is")
             for chunk in response:
                 st.write(chunk.text)
                 st.session_state['tchat_history'].append(("Bot", chunk.text))
+            st.session_state['tchat_history'].append(("-----------------------This is the end of the response-------------------------", ""))
                 
-        st.subheader("The Chat History is")
+        st.subheader("🕘 The Chat History is")
         for role, text in st.session_state['tchat_history']:
             st.write(f"{role}: {text}") 
                     

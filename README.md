@@ -16,7 +16,7 @@ Designed and developed an interactive Personal-advisor-chat-application with fea
 
 4. Store chunks in a vector database (FAISS)
 
-5. Query: Accept user question
+5. Query: Accept user question ( If no any cosine similarity with doc and query then "" or null=> similary socre is 0)
 
 6. Retriever: Find relevant chunks
 

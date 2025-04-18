@@ -8,6 +8,9 @@ import google.generativeai as genai
 import mysql.connector
 import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sns
+from PIL import Image
+# from sklearn.linear_model import LinearRegression 
 
 # Store and index data in multi dimensional vectors.
 # Chroma , milves, Pipecone , Faiss 
@@ -31,14 +34,17 @@ from langchain.prompts import PromptTemplate
 load_dotenv()
 ## configure the api key:-
 genai.configure(api_key=os.getenv("GOOGLE_API_SERVICE"))
-#model = genai.GenerativeModel("gemini-pro")
-model = ChatGoogleGenerativeAI(model="gemini-pro")
+model = genai.GenerativeModel("gemini-1.5-pro-latest")
+#model = ChatGoogleGenerativeAI(model="gemini-pro")
 
 l_chat = model.start_chat(history=[])
+lr_chat = model.start_chat(history=[])
 def get_gemini_response_store(question,k):    
     if k=='l':
         response=l_chat.send_message(question,stream=True)
-        return response
+    if k =='lr':
+        response=lr_chat.send_message(question,stream=True)
+    return response
 # MySQL Connection Configuration :- begin configuration:-
 # db_config = {
 #     "host": "localhost",
@@ -89,27 +95,49 @@ def fetch_user_progress(user_id):
     cursor = conn.cursor()
     try:
         cursor.execute("""
-            SELECT lesson_name, score, timestamp
+            SELECT lesson_name,score,timestamp
             FROM progress
             WHERE user_id = %s
             ORDER BY timestamp DESC
         """, (user_id,))
+         # timestamp, max(score) as maximum,min(score) as minimum,avg(score) as average,sum(score) as total_score,count(score) as total
+         # group by lesson_name,timestamp
         rows = cursor.fetchall()
     except mysql.connector.Error as err:
         st.error(f"Error: {err}")
     finally:
         cursor.close()    
         conn.close()
-    return pd.DataFrame(rows, columns=["Lesson", "Score", "Timestamp"])
+    #return pd.DataFrame(rows, columns=["Lesson","Timestamp","Maximum","Minimum","Average","Total Score","Total"])
+    dataframe = pd.DataFrame(rows, columns=["Lesson", "Score", "Timestamp"])
+    #dataframe['fixed_length'] = dataframe['Lesson'].astype(str).str.slice(0, 50)
+    #dataframe['fixed_length'] = dataframe['Lesson'].apply(lambda x: str(x)[:50] if pd.notnull(x) else x)
+    # Truncate paragraph to 50 characters
+    # ✅ For each row: truncate if longer than 50 chars
+    dataframe['fixed_length'] = dataframe['Lesson'].apply(
+        lambda x: x[:50] if isinstance(x, str) and len(x) > 50 else x
+    )
+
+    dataframe['fixed_size'] = dataframe['Lesson'].str.len()
+    dataframe['fixed_size'] = dataframe['fixed_size'].astype(float)
+    return dataframe
 
 def plot_progress(dataframe):
     # Create a figure with 2 rows and 3 columns
     #fig, axes = plt.subplots(5, 1, figsize=(30, 30))  # 5 rows, 1 columns
     
-    dataframe = dataframe.groupby('Lesson')['Score'].max().reset_index()[['Lesson','Score']]
+    dataframe = dataframe.groupby(['fixed_length','fixed_size'])['Score'].max().reset_index()[['fixed_length','Score','fixed_size']]
+    #dataframe['Score'] = dataframe['Score'].astype(int)
+    
+    # Lesson length fixed:-
+    #dataframe = dataframe[dataframe['Lesson'].str.len() <= 50][['Lesson','Score']]
+    dataframe = dataframe.sort_values('Score', ascending=False)
+    
+    #return dataframe
+
     # Line Plot
-    fig1 = plt.figure(figsize=(10, 5))
-    plt.plot(dataframe["Lesson"], dataframe["Score"], marker="o", color="b")
+    fig1 = plt.figure(figsize=(15, 5))
+    plt.plot(dataframe["fixed_length"], dataframe["Score"], marker="o", color="b")
     plt.title("Line Plot - User Progress")
     plt.xlabel("Lesson")
     plt.ylabel("Score")
@@ -117,8 +145,8 @@ def plot_progress(dataframe):
     st.pyplot(fig1)
 
     # Bar Chart
-    fig2 = plt.figure(figsize=(10, 5))
-    plt.bar(dataframe["Lesson"], dataframe["Score"], color="skyblue")
+    fig2 = plt.figure(figsize=(15, 5))
+    plt.bar(dataframe["fixed_length"], dataframe["Score"], color="skyblue")
     plt.title("Bar Chart - User Progress")
     plt.xlabel("Lesson")
     plt.ylabel("Score")
@@ -126,33 +154,104 @@ def plot_progress(dataframe):
     st.pyplot(fig2)
 
     # Histogram
-    fig3 = plt.figure(figsize=(10, 5))
-    plt.hist(dataframe["Score"], bins=5, color="orange", edgecolor="black")
+    fig3 = plt.figure(figsize=(30, 5))
+    plt.hist(dataframe["fixed_length"], bins=5, color="orange", edgecolor="black")
     plt.title("Histogram - Score Distribution")
     plt.xlabel("Score")
     plt.ylabel("Frequency")
     st.pyplot(fig3)
 
     # Pie Chart
-    fig4 = plt.figure(figsize=(10, 5))
+    fig4 = plt.figure(figsize=(25, 5))
     plt.pie(
         dataframe["Score"], 
-        labels=dataframe["Lesson"], 
+        labels=dataframe["fixed_length"], 
         autopct='%1.1f%%', 
         startangle=90, 
         colors=plt.cm.Paired.colors
     )
     plt.title("Pie Chart - Score Distribution")
     st.pyplot(fig4)
-
+    
     # Scatter Plot
-    fig5 = plt.figure(figsize=(10, 5))
-    plt.scatter(dataframe["Lesson"], dataframe["Score"], color="green", alpha=0.7)
+    fig5 = plt.figure(figsize=(15, 5))
+    plt.scatter(dataframe["fixed_length"], dataframe["Score"], color="green", alpha=0.7)
     plt.title("Scatter Plot - User Progress")
     plt.xlabel("Lesson")
     plt.ylabel("Score")
     plt.xticks(rotation=45)
     st.pyplot(fig5)
+
+    # Correlation Heatmap
+    fig6 = plt.figure(figsize=(10, 5))
+    plt.title("Correlation Heatmap - User Progress")
+    sns.heatmap(dataframe[['Score','fixed_size']].corr(), annot=True, cmap="coolwarm")
+    st.pyplot(fig6)
+    
+    # Box plot 
+    fig7 = plt.figure(figsize=(10, 5))
+    sns.boxplot(dataframe["Score"])
+    plt.title("Box Plot - User Progress")
+    st.pyplot(fig7)
+    
+    # Violin plot 
+    fig8 = plt.figure(figsize=(10, 5))
+    sns.violinplot(dataframe["Score"])
+    plt.title("Violin Plot - User Progress")
+    st.pyplot(fig8)
+    
+    # KDE plot
+    fig9 = plt.figure(figsize=(10, 5))
+    sns.kdeplot(dataframe["Score"], fill=True, shade=True)
+    plt.title("KDE Plot - User Progress")
+    st.pyplot(fig9)
+    
+    # Heatmap
+    fig10 = plt.figure(figsize=(10, 5))
+    sns.heatmap(dataframe[['Score','fixed_size']].corr(), annot=True, cmap="coolwarm")
+    plt.title("Heatmap - User Progress")
+    st.pyplot(fig10)
+    
+    # Swarm plot
+    fig11 = plt.figure(figsize=(10, 5))
+    sns.swarmplot(dataframe["Score"])
+    plt.title("Swarm Plot - User Progress")
+    st.pyplot(fig11)
+
+    # lmplot 
+    dataframe['Lesson_ID'] = dataframe.index  # or use LabelEncoder if needed
+    # fig5 = plt.figure(figsize=(10, 5))
+    # sns.lmplot(x="Lesson_ID", y="Score",data = dataframe)
+    # plt.title("LM Plot - User Progress")
+    # plt.xlabel("Lesson")
+    # plt.ylabel("Score")
+    # plt.xticks(rotation=45)
+    # st.pyplot(fig5)
+    # Create a numeric version of the fixed_length column
+    dataframe['fixed_length_num'] = dataframe['fixed_length'].apply(lambda x: len(x) if isinstance(x, str) else 0)
+    
+    fig5 = plt.figure(figsize=(10, 5))
+    sns.regplot(x="fixed_length_num", y="Score", data=dataframe)
+    plt.title("LM Plot - User Progress")
+    plt.xlabel("Lesson Length")
+    plt.ylabel("Score")
+    st.pyplot(fig5)
+    
+    # Linear Regression
+    # X = dataframe["fixed_length"].values.reshape(-1, 1)
+    # y = dataframe["Score"].values.reshape(-1, 1)
+    # model = LinearRegression().fit(X, y)
+    # y_pred = model.predict(X)
+    # plt.scatter(dataframe["fixed_length"], dataframe["Score"], color="green", alpha=0.7)
+    # plt.plot(dataframe["fixed_length"], y_pred, color="red", linewidth=2)
+    # plt.title("Linear Regression - User Progress")
+    # plt.xlabel("Lesson")
+    # plt.ylabel("Score")
+    # plt.xticks(rotation=45)
+    # st.pyplot(plt)
+    
+    # fig6 = sns.lmplot(x="fixed_length", y="Score", data=dataframe, aspect=2)
+    # st.pyplot(fig6)
     
 def pdf_reader(pdf_file):
     text=""
@@ -183,7 +282,8 @@ def get_conversational_chain():
 
     Answer:
     """
-    model = ChatGoogleGenerativeAI(model="gemini-pro",
+    # gemini-1.5-pro / gemini-pro / gemini-1.5-pro-latest / gemini-1.5-pro-001
+    model = ChatGoogleGenerativeAI(model="gemini-1.5-pro",
                              temperature=0.3)
 
     prompt = PromptTemplate(template = prompt_template, input_variables = ["context", "question"])
@@ -212,16 +312,19 @@ def user_input(user_question):
 if 'lchat_history' not in st.session_state:
     st.session_state['lchat_history'] = []
     
+if 'lrchat_history' not in st.session_state:
+    st.session_state['lrchat_history'] = []
+    
 def dashboard():
     #st.set_page_config("AI-Powered Learning Platform 📚")
     # App Title
     st.title("Welcome to AI-Powered Learning Platform 📚")
     # Sidebar Menu
-    menu = st.sidebar.radio("Menu", ["Personalized Lessons","Practice Exercises", "Question Answering","AI Tutor","Flash Card" ,"Lesson Recommendations","Progress Tracker"])
+    menu = st.sidebar.radio("Menu", ["Personalized Lessons","Practice Exercises", "Question Answering","Image Analyzer","AI Tutor","Flash Card" ,"Lesson Recommendations","Progress Tracker"])
     prompt = "Tell me about Learning Platform"
     if menu == "Personalized Lessons":
         st.header("Generate Personalized Lessons")
-        subject = st.text_input("Enter Subject (e.g., Python, Calculus, History)")
+        subject = st.text_input("Enter Subject (e.g., Python, Calculus, Machine Learning , Deep Learning,NLP , SQL , Data Science)")
         level = st.selectbox("Select Difficulty Level", ["Beginner", "Intermediate", "Advanced"])
         goal = st.text_area("What would you like to learn?")
         if st.button("Generate Lesson"):
@@ -229,13 +332,15 @@ def dashboard():
             st.write("----------------------------------------------------------------")
             st.write(f"### Lesson Content: for {subject} , {level} and {goal} :-")
             st.write("----------------------------------------------------------------")
+            random_number = np.random.randint(40,100)
+            result = log_progress(st.session_state.username,subject,random_number) # 88
             response = get_gemini_response(prompt)
             st.subheader('The response Output:-')
             st.write(response)
             
     elif menu == "Practice Exercises":
         st.header("Practice Exercises")
-        topic = st.text_input("Enter Topic (e.g., Python Loops, Calculus Derivatives)")
+        topic = st.text_input("Enter Topic (e.g., Python, Stastics,Hypothesis Testing Machine Learning , Deep Learning,NLP , SQL , Data Science)")
         num_questions = st.slider("Number of Questions", 1, 100, 5)
         if st.button("Generate Exercises"):
             random_number = np.random.randint(60,100)
@@ -256,14 +361,19 @@ def dashboard():
             st.write("----------------------------------------------------------------")
             st.write(f"### Tutor's Answer: for {question} :-")
             st.write("----------------------------------------------------------------")
+            # random_number = np.random.randint(30,100)
+            # result = log_progress(st.session_state.username,prompt,random_number)
             response = get_gemini_response_store(prompt,'l')
             #st.write(response)
             # Add user query and response to session state chat history
             st.session_state['lchat_history'].append(("You", question))
+            st.session_state['lchat_history'].append(("----------------------------------------", ""))
             st.subheader("The Response is")
             for chunk in response:
                 st.write(chunk.text)
                 st.session_state['lchat_history'].append(("Bot", chunk.text))
+            st.session_state['lchat_history'].append(("---------------Thank you for using AI Tutor!-------------------------", ""))    
+        # Show chat history
         st.subheader("The Chat History is")
         for role, text in st.session_state['lchat_history']:
             st.write(f"{role}: {text}")   
@@ -275,6 +385,8 @@ def dashboard():
             st.write("----------------------------------------------------------------")
             st.write(f"# Top 100 Flashcards Questions and Answers: for Topics:- {topic} :-")
             st.write("----------------------------------------------------------------")
+            random_number = np.random.randint(40,100)
+            result = log_progress(st.session_state.username,topic,random_number)
             response = get_gemini_response(prompt)
             st.subheader('The response Output:-')
             st.write(response)
@@ -285,9 +397,21 @@ def dashboard():
             st.write("----------------------------------------------------------------")
             st.write(f'Recommedations Next Lesson and Topics: for {c_lesson} :-')
             st.write("----------------------------------------------------------------")
-            response = get_gemini_response(prompt)
-            st.subheader('The response Output:-')
-            st.write(response)
+            response = get_gemini_response_store(prompt,'lr')
+            
+            st.session_state['lrchat_history'].append(("You", c_lesson))
+            st.session_state['lrchat_history'].append(("--------------------------------------------------------",""))
+            st.subheader("The Response is")
+            for chunk in response:
+                st.write(chunk.text)
+                st.session_state['lrchat_history'].append(("Bot", chunk.text))
+            st.session_state['lrchat_history'].append(("--------------------Thank you for using AI Tutor!---------------------",""))
+        st.subheader("The Chat History is")
+        for role, text in st.session_state['lrchat_history']:
+            st.write(f"{role}: {text}")
+            # response = get_gemini_response(prompt)
+            # st.subheader('The response Output:-')
+            # st.write(response)
     elif menu=='Question Answering':
         st.header("Chat with PDF File")
         pdf_file = st.file_uploader("Upload your PDF Files and Click on the Submit & Process Button", accept_multiple_files=True,type=["pdf"]) # True
@@ -305,10 +429,42 @@ def dashboard():
         st.write("----------------------------------------------------------------")
         if user_question:
             user_input(user_question)
+    elif menu =="Image Analyzer":
+        # Streamlit UI
+        st.title("🧠 Gemini Image Analyzer")
+        st.markdown("Upload an image and Gemini will describe it or answer questions about it!")
+        
+        # Upload image
+        uploaded_file = st.file_uploader("📤 Upload an image", type=["jpg", "jpeg", "png"])
+        
+        # Text prompt (optional)
+        prompt = st.text_input("🔍 What do you want Gemini to tell you about this image?", value="Describe this image in detail")
+        
+        if uploaded_file:
+            image = Image.open(uploaded_file)
+            st.image(image, caption="Uploaded Image") # use_column_width=True
+
+            if st.button("Analyze Image"):
+                with st.spinner("Analyzing..."):
+                    # Convert image to bytes
+                    image_bytes = uploaded_file.getvalue()
+
+                    # Gemini Vision model input
+                    response = model.generate_content([
+                        prompt,
+                        {
+                            "mime_type": "image/png",
+                            "data": image_bytes
+                        }
+                    ])
+
+                    # Output result
+                    st.subheader("🧾 Gemini's Analysis:")
+                    st.write(response.text)
 
     elif menu == "Progress Tracker":
         st.header("Track Your Progress")
-        user_id = st.text_input("Enter User ID", "user123")
+        user_id = st.text_input("Enter User ID", st.session_state.username)
         #st.write("Feature Coming Soon: Integrate with user authentication and database to track completed lessons, scores, and improvement areas.")
         if st.button("View Progress"):
             progress_df = fetch_user_progress(user_id)

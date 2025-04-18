@@ -43,7 +43,49 @@ Regulatory Compliance: Ensure HIPAA/GDPR compliance
 .............................
 ..........................................
 .............................
+from flask import Flask, render_template, request, redirect, flash
+from flask_sqlalchemy import SQLAlchemy
 
+app = Flask(__name__)
+app.secret_key = 'your_secret_key'
+
+# SQLite DB setup
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+db = SQLAlchemy(app)
+
+# DB model
+class Subscriber(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+
+# Create DB tables
+with app.app_context():
+    db.create_all()
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        if email:
+            if not Subscriber.query.filter_by(email=email).first():
+                new_subscriber = Subscriber(email=email)
+                db.session.add(new_subscriber)
+                db.session.commit()
+                flash("Successfully subscribed!", "success")
+            else:
+                flash("Email already subscribed.", "warning")
+        else:
+            flash("Please enter a valid email.", "danger")
+        return redirect('/')
+    return render_template('index.html')
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+
+......................
+............................
+.....................
 
 
 # # Streamlit App
@@ -620,3 +662,4 @@ if question:
 st.subheader("📜 Chat History:")
 for role, text in st.session_state.tchat_history:
     st.markdown(f"**{role}:** {text}")
+

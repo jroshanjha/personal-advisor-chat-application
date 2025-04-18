@@ -16,7 +16,7 @@ import json
 load_dotenv()
 ## configure the api key:-
 genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-model = genai.GenerativeModel("gemini-1.5-pro-latest")
+model = genai.GenerativeModel("gemini-1.5-pro-latest") # gemini-pro-vision , gemini-1.5-pro-latest
 
 def get_gemini_response(text):
     response = model.generate_content(text)
@@ -164,7 +164,7 @@ def medical_method():
     #st.set_page_config("AI-Powered Medical Diagnostic Tool 🩺")
     st.title("Welcome to Medical Diagnostic Tool 🩺")
     # Sidebar Menu
-    menu = st.sidebar.radio("Menu", ["Symptom Diagnosis","File Summary","Drug Information", "Healthcare Finder"])
+    menu = st.sidebar.radio("Menu", ["Symptom Diagnosis","File Summary","Image Analyzer","Drug Information", "Healthcare Finder"])
     prompt = "Tell me about Medical Diagnostic Tool"
     if menu == "Symptom Diagnosis":
         st.header("Symptom Diagnosis")
@@ -178,11 +178,12 @@ def medical_method():
             #response = get_gemini_response(prompt)
             response = get_gemini_response_store(prompt,'m')
             st.session_state['mchat_history'].append(("You", symptoms))
+            st.session_state['mchat_history'].append(("--------------------The Response is--------------------",""))
             st.subheader("The Response is")
             for chunk in response:
                 st.write(chunk.text)
                 st.session_state['mchat_history'].append(("Bot", chunk.text))
-                
+            st.session_state['mchat_history'].append(("---------------------Thanks for using our service-----------------------", ""))
         st.subheader("The Chat History is")
         for role, text in st.session_state['mchat_history']:
             st.write(f"{role}: {text}")
@@ -216,7 +217,39 @@ def medical_method():
             
         # else:
         #     st.write("### No File Uploaded")
+    elif menu =="Image Analyzer":
+        # Streamlit UI
+        st.title("🧠 Gemini Image Analyzer")
+        st.markdown("Upload an image and Gemini will describe it or answer questions about it!")
         
+        # Upload image
+        uploaded_file = st.file_uploader("📤 Upload an image", type=["jpg", "jpeg", "png"])
+        
+        # Text prompt (optional)
+        prompt = st.text_input("🔍 What do you want Gemini to tell you about this image?", value="Describe this image in detail")
+        
+        if uploaded_file:
+            image = Image.open(uploaded_file)
+            st.image(image, caption="Uploaded Image") # use_column_width=True
+
+            if st.button("Analyze Image"):
+                with st.spinner("Analyzing..."):
+                    # Convert image to bytes
+                    image_bytes = uploaded_file.getvalue()
+
+                    # Gemini Vision model input
+                    response = model.generate_content([
+                        prompt,
+                        {
+                            "mime_type": "image/png",
+                            "data": image_bytes
+                        }
+                    ])
+
+                    # Output result
+                    st.subheader("🧾 Gemini's Analysis:")
+                    st.write(response.text)
+     
     elif menu == "Drug Information":
         st.header("Drug Information")
         drug_name = st.text_input("Enter the drug name")
