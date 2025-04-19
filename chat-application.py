@@ -143,7 +143,7 @@ def navigation():
         "Medical Diagnostic":medical_method,
         "Logout":logout,
     }
-    st.set_page_config("Welcome Chat Application")
+    st.set_page_config("Welcome AI Chatbot Application")
     # Sidebar for Navigation
     with st.sidebar:
         st.title("Navigation")
@@ -183,7 +183,7 @@ if __name__ == "__main__":
         
     # Footer section
     st.markdown("---")
-    st.markdown("© 2024-2025 My Chat Application | All rights reserved. Developed by jroshan")
+    st.markdown("© 2024-2025 My AI Chatbot Application | All rights reserved. Developed by jroshan")
 
 
 ## st.sidebar.selectbox("Menu", ["Login", "Register"])

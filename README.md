@@ -23,11 +23,11 @@ Designed and developed an interactive Personal-advisor-chat-application with fea
 7. Generator: Ask Gemini a question, grounded on retrieved chunks
 
  
-# 🛠 Designed and developed an interactive, AI-driven chat application acting as a multi-functional personal advisor.
+# 🛠 Designed and developed an interactive, AI-driven AI Chatbot application acting as a multi-functional personal advisor.
 
-# 📚 Learning Platform – Delivers curated educational resources.
+# 📚 Learning Platform – Delivers curated educational resources as chat , prompt generated and Questions and Answering with PDF and Image Analysis for text extractions.
 
-# ✈️ Smart Travel Planner – Suggests travel itineraries and optimizes routes using Google Maps API.
+# ✈️ Smart Travel Planner – Suggests travel itineraries and optimizes routes for departments or destinations and tips' palnning for specific area as activtity or other events.
 
 # 💰 Personal Finance Advisor – Provides real-time financial insights, budgeting tips, and investment suggestions using Gemini & Google Finance APIs.
 
@@ -101,6 +101,12 @@ conda create -p venv python==3.11 -y
 
 conda activate venv/
 venv\Scripts\activate
+
+# Activate the virtual environment
+python -m venv my_code 
+python -m venv venv
+venv\Scripts\activate  # On Windows
+pip install -r requirements.txt
 
 # installment Requirements Library
 pip install -r requirements.txt

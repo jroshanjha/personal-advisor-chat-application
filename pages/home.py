@@ -5,7 +5,7 @@ import database
 def home():
     # Page title
     st.title("Home Page")
-    st.subheader("Welcome to Personal Advisor Chat Application!")
+    st.subheader("Welcome to Personal Advisor AI Chatbot Application!")
     # Call-to-action button
     st.button("Learn More", key="learn_more")
     # Display an image or logo
@@ -14,7 +14,7 @@ def home():
     # Welcome message
     st.markdown(
         """
-        Welcome to the **Home Page** of Personal Advisor Chat Application. 
+        Welcome to the **Home Page** of Personal Advisor AI Chatbot Application. 
         Here, you'll find the latest updates, resources, and insights to get started with Gemini API.
         """
     )
@@ -56,6 +56,6 @@ def home():
 
     # Footer section
     st.markdown("---")
-    st.markdown("© 2024-2025 Personal Advisor Chat Application | All rights reserved. Developed by jroshan")
+    st.markdown("© 2024-2025 Personal Advisor AI Chatbot Application | All rights reserved. Developed by jroshan")
 
 home()
