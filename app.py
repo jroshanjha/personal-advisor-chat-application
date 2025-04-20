@@ -10,6 +10,11 @@ import os
 import logged
 from logged import setup_logger
 logger = setup_logger()
+import logging
+console = logging.StreamHandler()
+console.setLevel(logging.ERROR)
+
+logging.getLogger('').addHandler(console)
 # from pages.home import index
 # from pages.about import about
 

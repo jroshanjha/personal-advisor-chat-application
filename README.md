@@ -168,3 +168,8 @@ docker pull jroshan/chatbot:latest
 
 # final :- 
 docker run -d -p 8080:8080 jroshan/chatbot:latest
+
+# ✅ 6. Access in Browser
+http://localhost:8501
+
+docker-compose up --build
