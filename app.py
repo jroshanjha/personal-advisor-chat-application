@@ -1,132 +1,213 @@
-import os
 import streamlit as st
-from dotenv import load_dotenv
-from langchain.document_loaders import PyPDFLoader
-from PyPDF2 import PdfReader,PdfMerger,PdfWriter
-from langchain.text_splitter import CharacterTextSplitter
-from langchain.vectorstores import FAISS
-# from langchain.embeddings import 
-from langchain_google_genai import ChatGoogleGenerativeAI , GoogleGenerativeAIEmbeddings
-from langchain.chains import ConversationalRetrievalChain
-from langchain.memory import ConversationBufferMemory
-import tempfile
-import google.generativeai as genai
-# Load environment variables
-load_dotenv()
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+import mysql.connector
+import bcrypt
+from modular import learningflatform
+from modular import travel
+from modular import finance
+from modular import medical
+from modular import sentiment_analysis
+import os
+# from pages.home import index
+# from pages.about import about
 
-# 🔐 Configure Google Generative AI
+# MySQL Connection Configuration :- begin configuration:-
+db_config = {
+    "host": "127.0.0.1",
+    "user": "root",  # Replace with your MySQL username
+    "password": "jroshan@98",  # Replace with your MySQL password
+    "database": "learning_model", # Replace with your MySQL database name
+    "port":3306
+}
+# MySQL Connection Configuration :- end configuration:-
+# conn = mysql.connector.connect(
+#     host="db4free.net",
+#     user="yourusername",
+#     password="yourpassword",
+#     database="yourdbname"
+# )
 
-os.environ["GOOGLE_API_KEY"] = GOOGLE_API_KEY
+# Host: sql12.freesqldatabase.com
+# Database name: sql12774097
+# Database user: sql12774097
+# Database password: WjSWZv19Pg
+# Port number: 3306
+# MySQL Connection Configuration :- begin configuration:-
 
+# --( https://phpmyadmin.co/server_sql.php?db= )
+db_config = {
+    "host":"sql12.freesqldatabase.com",
+    "user":"sql12774097",
+    "password":"WjSWZv19Pg",
+    "database":"sql12774097",
+    "port":3306
+}
 
-# Define embeddings and model
-#embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
-#llm = ChatGoogleGenerativeAI(model="gemini-pro",convert_system_message_to_human=True, temperature=0.3)
+# db_config = {
+#     'host': os.getenv('9TNMY74'),
+#     'user': os.getenv('root'),
+#     'password': os.getenv('jroshan@98'),
+#     'database': os.getenv('learning_model'),
+#     'port': 3306,
+# }
 
+# Connect to MySQL
+def get_db_connection():
+    return mysql.connector.connect(**db_config)
+# Hash Password
+def hash_password(password):
+    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
+# Check Password
+def check_password(password, hashed_password):
+    return bcrypt.checkpw(password.encode("utf-8"), hashed_password.encode("utf-8"))
+# Add New User
+def register_user(username, password):
+    hashed = hash_password(password)
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        # Check if the username already exists
+        cursor.execute("SELECT COUNT(*) FROM users WHERE username = %s", (username,))
+        user_exists = cursor.fetchone()[0]
 
-# # Embeddings for FAISS
-# embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+        if user_exists > 0:
+            st.error("Username already exists. Please choose a different username.")
+        else:
+            # Insert the new user
+            cursor.execute(
+                "INSERT INTO users (username, password) VALUES (%s, %s)",
+                (username, hashed.decode("utf-8"))
+            )
+            conn.commit()
+            st.success("Registration successful! Please login.")
 
-# # Chat model for QA chain
-# llm = ChatGoogleGenerativeAI(model="gemini-pro", convert_system_message_to_human=True)
+    except mysql.connector.Error as err:
+        st.error(f"Error: {err}")
+    finally:
+        cursor.close()
+        conn.close()
 
-# 💬 LLM (Gemini Pro)
-llm = ChatGoogleGenerativeAI(
-    model="gemini-1.5-pro-latest", # gemini-pro-vision-001
-    convert_system_message_to_human=True,
-    temperature=0.7
-)
-# 📌 Embeddings
-embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+# Authenticate User
+def authenticate_user(username, password):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("SELECT password FROM users WHERE username = %s", (username,))
+        user = cursor.fetchone()
+        if user and check_password(password, user[0]):
+            return True
+        return False
+    except mysql.connector.Error as err:
+        st.error(f"Error: {err}")
+    finally:
+        cursor.close()
+        conn.close()
+# Login Form
+def login():
+    st.title("Login")
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
+    if st.button("Login"):
+        if authenticate_user(username, password):
+            st.session_state.authenticated = True
+            st.session_state.username = username
+            st.session_state.page = "Dashboard"
+            st.success("Logged in successfully!")
+            st.rerun()
+            #st.home()
+            #learningflatform.dashboard()
+            #home()
+        else:
+            st.error("Invalid username or password.")          
+# Register Form
+def register():
+    st.title("Register")
+    username = st.text_input("New Username")
+    password = st.text_input("New Password", type="password")
+    if st.button("Register"):
+        register_user(username, password)
+        #st.session_state.page = "Login"
+        #st.rerun()
+    # if st.button("Back to Login"):
+    #     st.session_state.page = "Login"
+    #     st.rerun()
+# Logout section 
+def logout():
+    if st.button("Logout"):
+        st.session_state.authenticated = False
+        st.session_state.username = None
+        st.success("Logout successful!")
+        #login()
+        st.session_state.page = "Login"
+        st.rerun()
+        #st.session_state.page = "Login"
+        # if "authenticated" not in st.session_state:
+        #     navigation()
+        #st.session_state.authenticated = False      
+# Dashboard
+def leaning():
+    st.title("Dashboard")
+    st.write(f"Welcome, {st.session_state.username}!")
+    #st.dashboard()
+    learningflatform.dashboard()   
+    #learningflatform()
+    
+# Navigation
+def navigation():
+    if "page" not in st.session_state:
+        st.session_state.page = "Login"
 
-# 🧠 VectorStore (Assume you already created and loaded your FAISS store)
-vectorstore = FAISS.load_local("faiss_index", embeddings, allow_dangerous_deserialization=True)
-#vectorstore.save_local("faiss_index") # faiss_index
+    pages = {
+        # "Home": home,
+        # "About": about,
+        "Login": login,
+        "Register": register,
+        "Learning Platform": leaning,
+        "Smart Travel Planner": travel.t_ravel,
+        "Personal Finance Advisor":finance.financial,
+        "Medical Diagnostic":medical.medical_method,
+        "Text-Analysis":sentiment_analysis.main,
+        "Logout":logout,
+    }
+    st.set_page_config("Welcome AI Chatbot Application")
+    # Sidebar for Navigation
+    with st.sidebar:
+        st.title("Navigation")
+        if st.session_state.authenticated:
+            selection = st.radio("Go to", ["Learning Platform","Smart Travel Planner","Personal Finance Advisor","Medical Diagnostic","Text-Analysis","Logout"])
+        else:
+            selection = st.radio("Go to", ["Login", "Register"]) # "Home", "About"
 
-def pdf_reader(pdf_file):
-    text=""
-    for pdf in pdf_file:
-        pdf_reader = PdfReader(pdf)
-        for page in pdf_reader.pages:
-            text += page.extract_text()
-    return text
+        st.session_state.page = selection
 
-# Streamlit UI
-st.title("📄 Chat with Your PDF - Powered by Gemini & RAG")
+    # Render the selected page
+    pages[st.session_state.page]()
 
-uploaded_file = st.file_uploader("Upload a PDF file",accept_multiple_files=True, type=["pdf"])
-# if uploaded_files:
-#     for file in uploaded_files:
-#         with open(file.name, "wb") as f:
-#             f.write(file.read())
+# # Main Application Logic
+# if st.session_state.authenticated:
+#     learningflatform.dashboard()
+# else:
+#     menu = st.sidebar.selectbox("Menu", ["Login", "Register"])
+#     if menu == "Login":
+#         login()
+#     elif menu == "Register":
+#         register()
 
-        # loader = PyPDFLoader(file.name)
-        # docs = loader.load()
+# # Streamlit Session State Management
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+    st.session_state.username = None
+
+# Main
+if __name__ == "__main__":
+    if "authenticated" not in st.session_state and not st.session_state.username:
+        st.session_state.authenticated = False
+        login()
+        st.rerun()
+    else:
+        navigation()
         
-if uploaded_file:
-    with st.spinner("Processing PDF..."):
-        # Load and split PDF
-        all_docs = []
-        
-        for file in uploaded_file:
-            # Save uploaded file temporarily
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
-                tmp_file.write(file.read())
-                tmp_path = tmp_file.name
-                
-            # Load and split PDF
-            loader = PyPDFLoader(tmp_path)
-            documents = loader.load()
-            text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
-            docs = text_splitter.split_documents(documents)
-            all_docs.extend(docs)
-            
-        # loader = PyPDFLoader(uploaded_file.name)
-        # documents = loader.load()
-        # text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
-        # docs = text_splitter.split_documents(documents)
+    # Footer section
+    st.markdown("---")
+    st.markdown("© 2024-2025 My AI Chatbot Application | All rights reserved. Developed by jroshan")
 
-        # Create vector store
-        vectorstore = FAISS.from_documents(docs, embeddings)
-
-        # Conversational memory and retriever chain
-        memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
-        retriever = vectorstore.as_retriever()
-
-        # 🔄 Chain
-        qa_chain = ConversationalRetrievalChain.from_llm(
-            llm=llm,
-            retriever=vectorstore.as_retriever(),
-            memory=memory,
-            verbose=True
-        )
-
-        # Ask questions
-        question = st.text_input("Ask a question about the PDF")
-        if st.button("Get Answer") and question:
-            with st.spinner("Thinking..."):
-                result = qa_chain.run(question)
-                st.subheader("📜 Answer")
-                st.write(result)
-
-        # Download PDF
-        
-        
-        
-# ✅ Fixes Applied:
-# Handles multiple files using accept_multiple_files=True.
-
-# Uses tempfile.NamedTemporaryFile() to safely handle file I/O.
-
-# Ensures uploaded_file.name is not misused on a list.
-
-# Works perfectly with your Gemini-powered RAG pipeline.
-
-# ✅ 2. Correct model names
-# These are the latest working model names for the Gemini API:
-
-
-# Purpose	Model Name
-# Chat/LLM	"gemini-pro"
-# Embeddings	"models/embedding-001"
+## st.sidebar.selectbox("Menu", ["Login", "Register"])

@@ -26,7 +26,7 @@ model = genai.GenerativeModel("gemini-1.5-pro-001")
 
 embedding = GoogleGenerativeAIEmbeddings(model="embedding-001")
 
-t_chat = model.start_chat(history=[])
+#t_chat = model.start_chat(history=[])
 # r_chat = model.start_chat(history=[])
 
 # Initialize chat and history in session state
@@ -140,7 +140,7 @@ def t_ravel():
     elif menu == "Packing List":
         st.header("Packing List Generator")
         destination = st.text_input("Destination")
-        travel_dates = st.date_input("Travel Dates", [])
+        travel_dates = st.date_input("Travel Dates", [])  # min_value=date.today()
         activity_type = st.text_area("Activities (e.g., hiking, formal events)")
 
         if st.button("Generate Packing List"):
@@ -182,8 +182,8 @@ def t_ravel():
             # st.subheader('The response Output:-')
             # st.write(response)
 # Main
-if __name__ == "__main__":
-    t_ravel()
+# if __name__ == "__main__":
+#     t_ravel()
 
 
 

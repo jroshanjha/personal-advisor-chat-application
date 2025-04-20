@@ -6,10 +6,16 @@ import matplotlib.pyplot as plt
 
 # Database Initialization
 # MySQL Connection Configuration
+# conn = mysql.connector.connect(
+#     host="localhost",
+#     user="root",
+#     password="jroshan@98"
+# )
+
 conn = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="jroshan@98"
+    host="sql12.freesqldatabase.com",
+    user="sql12774097",
+    password="WjSWZv19Pg"
 )
 cursor = conn.cursor()
 
@@ -19,10 +25,10 @@ cursor = conn.cursor()
 #print("Database 'learning_model' created successfully!")
 def init_db():
     conn = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="jroshan@98",
-        database="learning_model"
+        host="sql12.freesqldatabase.com",
+        user="sql12774097",
+        password="WjSWZv19Pg",
+        database=" sql12774097" # learning_model
     )
     cursor = conn.cursor()
     cursor.execute("""
@@ -41,7 +47,7 @@ def init_db():
 def create_database_and_table():
     try:
         # Use the new database
-        cursor.execute("USE learning_model")
+        cursor.execute("USE sql12774097")
         # Create Table
         cursor.execute("""
                 CREATE TABLE IF NOT EXISTS progress (
@@ -66,8 +72,9 @@ def create_database_and_table():
         print(f"Error: {err}")
     finally:
         if conn.is_connected():
-            cursor.close()
-            conn.close()
+            pass
+            # cursor.close()
+            # conn.close()
 # # Run the function to create the database and table
 #create_database_and_table()
 
@@ -102,7 +109,7 @@ def insert_default_values():
         # Connect to MySQL Server
         # conn = mysql.connector.connect(**db_config)
         # cursor = conn.cursor()
-        cursor.execute("use learning_model ")
+        cursor.execute("use sql12774097")
         # Insert Default Values
         for entry in default_values:
             cursor.execute("""
@@ -120,7 +127,7 @@ def insert_default_values():
             cursor.close()
             conn.close()
 # Run the function to insert default values
-#insert_default_values()
+insert_default_values()
 
 
 

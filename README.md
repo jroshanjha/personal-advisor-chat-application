@@ -95,6 +95,8 @@ Drug Information & Healthcare Finder ...
 # https://www.investopedia.com/personal-finance-advisor/
 
 
+# Python Version >= 3.11
+
 # Install python 3.11 
 conda create -p venv python==3.11 -y 
 # create Python Virtual Environment with python 3.11
@@ -133,3 +135,36 @@ gunicorn
 Creatr .env file and past there...
 GOOGLE_API_KEY ="AIzaSyCKnIRMMdFQtgP6C77T3EdmoL9R_wW7m0g"
 GOOGLE_API_SERVICE ="AIzaSyCWsS5zmsstSDipuLUHyfVLFP-1LkcVlxs"
+
+
+
+# ✅ Step 3: Build and run Docker locally
+docker build -t jroshan/chatbot .
+
+# Docker Images
+docker images
+
+# Rund Docker App
+docker run -p 8501:8501 jroshan/chatbot
+
+
+## docker port , host
+docker psc
+
+## push docker image into docker container
+docker login ( jroshan)
+
+docker image rm -f welcome-app 
+
+# rename 
+docker tag jroshan/chatbot jroshan/chatbot-app
+
+
+# push 
+docker push jroshan/chatbot
+docker push jroshan/chatbot:lates
+
+docker pull jroshan/chatbot:latest
+
+# final :- 
+docker run -d -p 8080:8080 jroshan/chatbot:latest

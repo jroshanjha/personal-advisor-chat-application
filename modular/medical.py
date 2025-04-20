@@ -12,17 +12,29 @@ from PIL import Image
 from PyPDF2 import PdfReader,PdfMerger,PdfWriter
 import docx
 import json
+from langchain_google_genai import ChatGoogleGenerativeAI,GoogleGenerativeAIEmbeddings
+# from langchain.embeddings import GoogleGenerativeAIEmbeddings
 
 load_dotenv()
 ## configure the api key:-
 genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 model = genai.GenerativeModel("gemini-1.5-pro-latest") # gemini-pro-vision , gemini-1.5-pro-latest
 
+# Initialize the model
+#model = ChatGoogleGenerativeAI(model="gemini-pro")
+embedding = GoogleGenerativeAIEmbeddings(model="embedding-001")
+
 def get_gemini_response(text):
-    response = model.generate_content(text)
-    return response.text
+    try:
+        response = model.generate_content(text)  # Use generate_content for simple response generation
+        return response.text
+    except Exception as e:
+        st.error(f"Error with API call: {e}")
+        return "Sorry, there was an issue processing your request."
+
 m_chat = model.start_chat(history=[])
 chat_history = []
+
 def get_gemini_response_store(question,k):
     if k=='m':
         response=m_chat.send_message(question,stream=True)
@@ -33,6 +45,15 @@ def get_gemini_response_store(question,k):
             'response': response_text
         })
         return response  
+
+# def get_gemini_response_store1(question,k):
+#     try:
+#         response = model.generate_content(question)  # Use generate_content to directly get chat response
+#         return response
+#     except Exception as e:
+#         st.error(f"Error with API call: {e}")
+#         return "Sorry, there was an issue processing your request."
+    
 def fetch_drug_info(drug_name):
     url = f"https://api.fda.gov/drug/label.json?search=openfda.brand_name:{drug_name}"
     response = requests.get(url)
@@ -178,12 +199,12 @@ def medical_method():
             #response = get_gemini_response(prompt)
             response = get_gemini_response_store(prompt,'m')
             st.session_state['mchat_history'].append(("You", symptoms))
-            st.session_state['mchat_history'].append(("--------------------The Response is--------------------",""))
+            st.session_state['mchat_history'].append(("-------------------------------------The Response is----------------------------------",""))
             st.subheader("The Response is")
             for chunk in response:
                 st.write(chunk.text)
                 st.session_state['mchat_history'].append(("Bot", chunk.text))
-            st.session_state['mchat_history'].append(("---------------------Thanks for using our service-----------------------", ""))
+            st.session_state['mchat_history'].append(("-------------------------------------Thanks for using our service-----------------------", ""))
         st.subheader("The Chat History is")
         for role, text in st.session_state['mchat_history']:
             st.write(f"{role}: {text}")
@@ -298,5 +319,5 @@ def medical_method():
             st.subheader('The response Output:-')
             st.write(response)
 # Main
-if __name__ == "__main__":
-    medical_method()
+# if __name__ == "__main__":
+#     medical_method()

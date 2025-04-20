@@ -82,8 +82,7 @@ def main():
         else:
             st.warning("Please enter some text before extracting named entities.")
 
-
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
     
     

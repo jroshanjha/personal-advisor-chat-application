@@ -122,5 +122,5 @@ def financial():
             st.write(f"{role}: {text}") 
    
 # # Main
-if __name__ == "__main__":
-    financial()
+# if __name__ == "__main__":
+#     financial()

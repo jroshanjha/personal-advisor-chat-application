@@ -478,5 +478,5 @@ def dashboard():
                 st.write("No progress data found!")
 
 # Main
-if __name__ == "__main__":
-    dashboard()
+# if __name__ == "__main__":
+#     dashboard()

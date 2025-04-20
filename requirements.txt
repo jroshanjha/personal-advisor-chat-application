@@ -31,3 +31,5 @@ python-magic
 python-docx
 
 # --------------------------------
+transformers
+torch
