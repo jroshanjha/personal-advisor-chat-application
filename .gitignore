@@ -6,9 +6,10 @@ __pycache__/
 *.py[co]
 
 faiss_index
+
 # Environment Files
-.env
-*.env
+# .env
+# *.env
 *.venv
 env/
 venv/
