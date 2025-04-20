@@ -307,7 +307,6 @@ def user_input(user_question):
     
     print(response)
     st.write("Reply: ", response["output_text"])
-
     
 def dashboard():
     # Initialize session state for chat history if it doesn't exist
