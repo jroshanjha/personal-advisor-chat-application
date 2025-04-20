@@ -177,10 +177,10 @@ def process_file(uploaded_file):
 
     return extracted_content, file_extension
 
-if 'mchat_history' not in st.session_state:
-    st.session_state['mchat_history'] = []
     
 def medical_method():
+    if 'mchat_history' not in st.session_state:
+        st.session_state['mchat_history'] = []
     # Title
     #st.set_page_config("AI-Powered Medical Diagnostic Tool 🩺")
     st.title("Welcome to Medical Diagnostic Tool 🩺")

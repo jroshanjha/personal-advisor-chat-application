@@ -28,19 +28,6 @@ embedding = GoogleGenerativeAIEmbeddings(model="embedding-001")
 
 #t_chat = model.start_chat(history=[])
 # r_chat = model.start_chat(history=[])
-
-# Initialize chat and history in session state
-if 't_chat' not in st.session_state:
-    st.session_state.t_chat = model.start_chat(history=[])
-    
-if 'tchat_history' not in st.session_state:
-    st.session_state.tchat_history = []
-    
-if 'r_chat' not in st.session_state:
-    st.session_state.r_chat = model.start_chat(history=[])
-    
-if 'rchat_history' not in st.session_state:
-    st.session_state.rchat_history = []
     
 def get_gemini_response(text):
     response = model.generate_content(text)
@@ -60,6 +47,16 @@ def get_gemini_response_store(question,k):
 #     st.session_state['tchat_history'] = []
     
 def t_ravel():
+    # Initialize chat and history in session state
+    if 't_chat' not in st.session_state:
+        st.session_state.t_chat = model.start_chat(history=[])
+    if 'tchat_history' not in st.session_state:
+        st.session_state.tchat_history = []
+    if 'r_chat' not in st.session_state:
+        st.session_state.r_chat = model.start_chat(history=[])
+    if 'rchat_history' not in st.session_state:
+        st.session_state.rchat_history = []
+    
     ##title for title bar:- 
     ##st.set_page_config("Smart Travel Planner 🌍")  
     # Page title

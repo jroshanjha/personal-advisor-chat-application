@@ -44,9 +44,9 @@ def get_gemini_response_store(question,k):
 def get_gemini_response(text):
     response = model.generate_content(text)
     return response.text
-if 'fchat_history' not in st.session_state:
-    st.session_state['fchat_history'] = []
 def financial():
+    if 'fchat_history' not in st.session_state:
+        st.session_state['fchat_history'] = []
     #title for title bar:- 
     ##st.set_page_config("Personal Finance Advisor 💰")    
     # Title

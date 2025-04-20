@@ -307,15 +307,14 @@ def user_input(user_question):
     
     print(response)
     st.write("Reply: ", response["output_text"])
-    
-# Initialize session state for chat history if it doesn't exist
-if 'lchat_history' not in st.session_state:
-    st.session_state['lchat_history'] = []
-    
-if 'lrchat_history' not in st.session_state:
-    st.session_state['lrchat_history'] = []
+
     
 def dashboard():
+    # Initialize session state for chat history if it doesn't exist
+    if 'lchat_history' not in st.session_state:
+        st.session_state['lchat_history'] = []
+    if 'lrchat_history' not in st.session_state:
+        st.session_state['lrchat_history'] = []
     #st.set_page_config("AI-Powered Learning Platform 📚")
     # App Title
     st.title("Welcome to AI-Powered Learning Platform 📚")
