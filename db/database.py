@@ -46,11 +46,17 @@ import mysql.connector
 
 # ✅ Set up MySQL connection
 def get_connection():
+    # return mysql.connector.connect(
+    #     host="localhost",
+    #     user="root",
+    #     password="jroshan@98",
+    #     database="learning_model"
+    # )
     return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="jroshan@98",
-        database="learning_model"
+        host="sql12.freesqldatabase.com",
+        user="sql12774097",
+        password="WjSWZv19Pg",
+        database="sql12774097"
     )
 
 # ✅ Create table if not exists
