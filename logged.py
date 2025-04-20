@@ -39,7 +39,7 @@
 # logging.info('This is a log message.')
 
 
-# logger_config.py
+# logged.py
 import logging
 from logging.handlers import RotatingFileHandler
 import os

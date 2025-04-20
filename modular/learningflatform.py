@@ -55,11 +55,19 @@ def get_gemini_response_store(question,k):
 # connect Mysql:-
 def get_db_conn():
     #return mysql.connector.connect(**db_config)
+    # return mysql.connector.connect(
+    #     host="127.0.0.1",
+    #     user="root",
+    #     password="jroshan@98",
+    #     database="learning_model",
+    #     port =3306
+    # )
+    
     return mysql.connector.connect(
-        host="127.0.0.1",
-        user="root",
-        password="jroshan@98",
-        database="learning_model",
+        host="sql12.freesqldatabase.com",
+        user="sql12774097",
+        password="WjSWZv19Pg",
+        database="sql12774097",
         port =3306
     )
 def get_gemini_response(text):
