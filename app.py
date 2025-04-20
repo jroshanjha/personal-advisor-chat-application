@@ -7,6 +7,9 @@ from modular import finance
 from modular import medical
 from modular import sentiment_analysis
 import os
+import logged
+from logged import setup_logger
+logger = setup_logger()
 # from pages.home import index
 # from pages.about import about
 
@@ -81,8 +84,10 @@ def register_user(username, password):
             st.success("Registration successful! Please login.")
 
     except mysql.connector.Error as err:
+        logger.info("Authorization failed.")
         st.error(f"Error: {err}")
     finally:
+        logger.info("Authorization successful.")
         cursor.close()
         conn.close()
 
@@ -111,12 +116,14 @@ def login():
             st.session_state.authenticated = True
             st.session_state.username = username
             st.session_state.page = "Dashboard"
+            logger.info("Authorization successful.")
             st.success("Logged in successfully!")
             st.rerun()
             #st.home()
             #learningflatform.dashboard()
             #home()
         else:
+            logger.info("Authorization successful.")
             st.error("Invalid username or password.")          
 # Register Form
 def register():
@@ -199,6 +206,7 @@ if "authenticated" not in st.session_state:
 
 # Main
 if __name__ == "__main__":
+    logger.info("Running the main function.")
     if "authenticated" not in st.session_state and not st.session_state.username:
         st.session_state.authenticated = False
         login()
