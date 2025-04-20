@@ -301,3 +301,50 @@ st.subheader("📜 Chat History:")
 for role, text in st.session_state.tchat_history:
     st.markdown(f"**{role}:** {text}")
 
+
+
+
+........................................
+🔐 Option 1: Use GOOGLE_API_KEY (Simplest for Gemini API)
+If you're only using Gemini (via google.generativeai or LangChain’s GoogleGenerativeAIEmbeddings), just set your API key explicitly.
+
+✅ Add to your code:
+
+import os
+os.environ["GOOGLE_API_KEY"] = "your-api-key"
+Or use dotenv:
+
+.env
+
+GOOGLE_API_KEY=your-api-key
+app.py
+
+from dotenv import load_dotenv
+load_dotenv()
+✅ Set environment variable on Render:
+Go to Render dashboard → Environment → Add Environment Variable
+
+
+Key: GOOGLE_API_KEY
+Value: your-api-key-here
+🔐 Option 2: Use Google Cloud Service Account JSON
+Only needed if you're using Vertex AI or Google Cloud Services that require OAuth2 credentials.
+
+Steps:
+Go to Google Cloud Console → IAM
+
+Create a Service Account with appropriate permissions
+
+Create and download JSON key file
+
+Rename it to service-account.json
+
+import os
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "service-account.json"
+In Docker: COPY the file and set the ENV
+
+dockerfile
+COPY service-account.json /app/service-account.json
+ENV GOOGLE_APPLICATION_CREDENTIALS=/app/service-account.json
+⚠️ Do not commit your service-account.json to GitHub. Use environment variables or secrets management.
+
