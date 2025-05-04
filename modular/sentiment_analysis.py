@@ -1,5 +1,6 @@
 import streamlit as st
 from transformers import pipeline, AutoModelForSequenceClassification, AutoTokenizer
+from transformers import AutoModelForTokenClassification
 import torch
 
 # def main():
@@ -37,7 +38,6 @@ def load_custom_model():
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     model = AutoModelForSequenceClassification.from_pretrained(model_name)
     return pipeline("sentiment-analysis", model=model, tokenizer=tokenizer)
-
 def main():
     st.title("NLP Sentiment Analysis & NER App")
     st.write("Enter text below to analyze its sentiment and extract named entities using pre-trained or fine-tuned Hugging Face models.")
@@ -67,11 +67,19 @@ def main():
 
     if st.button("Extract Named Entities"):
         if user_input:
+            # Clear the cache manually or force a re-download
+            #tokenizer = AutoTokenizer.from_pretrained("dslim/bert-base-NER", force_download=True)
+            #model = AutoModelForTokenClassification.from_pretrained("dslim/bert-base-NER", force_download=True)
+
+            tokenizer = AutoTokenizer.from_pretrained("dslim/bert-base-NER")
+            model = AutoModelForTokenClassification.from_pretrained("dslim/bert-base-NER")
+            ner = pipeline("ner", model=model, tokenizer=tokenizer, grouped_entities=True)
+           
             # Use a free pretrained NER model from Hugging Face
-            ner_pipeline = pipeline("ner", model="dslim/bert-base-NER", grouped_entities=True)
+            #ner_pipeline = pipeline("ner", model="dslim/bert-base-NER", grouped_entities=True)
             
             # Perform Named Entity Recognition
-            entities = ner_pipeline(user_input)
+            entities = ner(user_input)
     
             st.write("**Named Entities:**")
             # Display results

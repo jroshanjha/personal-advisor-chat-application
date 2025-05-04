@@ -174,3 +174,10 @@ http://localhost:8501
 
 
 docker-compose up --build
+
+
+
+
+#  Remove-Item "$env:USERPROFILE\.cache\huggingface\hub\models--dslim--bert-base-NER" -Recurse -Force
+
+pip install --upgrade transformers tokenize

@@ -42,13 +42,13 @@ db_config = {
 # MySQL Connection Configuration :- begin configuration:-
 
 # --( https://phpmyadmin.co/server_sql.php?db= )
-db_config = {
-    "host":"sql12.freesqldatabase.com",
-    "user":"sql12774097",
-    "password":"WjSWZv19Pg",
-    "database":"sql12774097",
-    "port":3306
-}
+# db_config = {
+#     "host":"sql12.freesqldatabase.com",
+#     "user":"sql12774097",
+#     "password":"WjSWZv19Pg",
+#     "database":"sql12774097",
+#     "port":3306
+# }
 
 # db_config = {
 #     'host': os.getenv('9TNMY74'),

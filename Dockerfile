@@ -75,3 +75,34 @@ CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0
 
 # # Run Streamlit
 # CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+
+
+
+# # # Use a Python base image
+# FROM python:3.10-slim
+
+# # Create app directory
+# WORKDIR /app
+
+# # Copy files
+# COPY requirements.txt .
+# COPY download_model.py .
+# COPY main.py .
+
+# # Install dependencies
+# RUN pip install --upgrade pip && \
+#     pip install -r requirements.txt
+
+# # Optionally preload the model (to avoid downloading at runtime)
+# RUN python download_model.py
+
+# # Run the app
+# CMD ["python", "main.py"]
+
+
+# 🚀 How to Build & Run
+# # Step 1: Build the Docker image
+# docker build -t ner-app .
+
+# # Step 2: Run the container
+# docker run --rm ner-app

@@ -6,17 +6,17 @@ import matplotlib.pyplot as plt
 
 # Database Initialization
 # MySQL Connection Configuration
-# conn = mysql.connector.connect(
-#     host="localhost",
-#     user="root",
-#     password="jroshan@98"
-# )
-
 conn = mysql.connector.connect(
-    host="sql12.freesqldatabase.com",
-    user="sql12774097",
-    password="WjSWZv19Pg"
+    host="localhost",
+    user="root",
+    password="jroshan@98"
 )
+
+# conn = mysql.connector.connect(
+#     host="sql12.freesqldatabase.com",
+#     user="sql12774097",
+#     password="WjSWZv19Pg"
+# )
 cursor = conn.cursor()
 
 
