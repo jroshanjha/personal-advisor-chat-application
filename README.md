@@ -33,6 +33,8 @@ Designed and developed an interactive Personal-advisor-chat-application with fea
 
 # 🏥 Medical Diagnostic Tool – Offers basic diagnostic suggestions (non-clinical) using symptom analysis and AI conversation.
 
+# Sentiment Analysis ( Pre-Trained and Fine-Tuning )  and Name Entity Recognizations.
+
 # 🎨 Built a user-friendly front-end using Streamlit, supporting dynamic interaction and personalized recommendations.
 
 # 🔗 Seamlessly connected with Gemini API and Google Services to ensure real-time, context-aware responses across modules.

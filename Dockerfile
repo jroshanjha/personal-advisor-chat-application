@@ -38,6 +38,9 @@ COPY . .
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Optionally preload the model (to avoid downloading at runtime)
+RUN python modular/download_model.py
+
 # Expose port
 EXPOSE 8501
 
